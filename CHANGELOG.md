@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Environment management core infrastructure
+- Projects, environments, and variables database schema
+- New API routers for environment management
+- Database migrations for environment management features
+- Comprehensive project plan and development roadmap
+
+### Changed
+
+- Refactored from todo-based to environment management system
+- Updated authentication flow for new use case
+- Removed placeholder todo functionality
+- Updated database schema to support environment variables
+- Modified API structure for environment management endpoints
+
+### Fixed
+
+- Updated imports and dependencies after schema changes
+- Fixed authentication integration with new project structure
+
 ---
 
 ## [1.0.2] - 2025-01-19
