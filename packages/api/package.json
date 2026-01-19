@@ -1,29 +1,29 @@
 {
-	"name": "@env-manager/api",
-	"type": "module",
-	"exports": {
-		".": {
-			"default": "./src/index.ts"
-		},
-		"./*": {
-			"default": "./src/*.ts"
-		}
-	},
-	"scripts": {},
-	"dependencies": {
-		"@env-manager/auth": "workspace:*",
-		"@env-manager/db": "workspace:*",
-		"@env-manager/env": "workspace:*",
-		"@trpc/client": "catalog:",
-		"@trpc/server": "catalog:",
-		"@types/pg": "catalog:",
-		"dotenv": "catalog:",
-		"drizzle-orm": "catalog:",
-		"next": "catalog:",
-		"zod": "catalog:"
-	},
-	"devDependencies": {
-		"@env-manager/config": "workspace:*",
-		"typescript": "catalog:"
-	}
+  "name": "@env-manager/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@env-manager/auth": "workspace:*",
+    "@env-manager/db": "workspace:*",
+    "@env-manager/env": "workspace:*",
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "@types/pg": "catalog:",
+    "dotenv": "catalog:",
+    "drizzle-orm": "catalog:",
+    "next": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@env-manager/config": "workspace:*",
+    "typescript": "catalog:"
+  }
 }

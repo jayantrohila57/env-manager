@@ -1,52 +1,52 @@
 {
-	"name": "env-manager",
-	"version": "1.0.1",
-	"private": true,
-	"workspaces": [
-		"apps/*",
-		"packages/*"
-	],
-	"type": "module",
-	"scripts": {
-		"dev": "turbo dev",
-		"build": "turbo build",
-		"check-types": "turbo check-types",
-		"dev:native": "turbo -F native dev",
-		"dev:web": "turbo -F web dev",
-		"db:push": "turbo -F @env-manager/db db:push",
-		"db:studio": "turbo -F @env-manager/db db:studio",
-		"db:generate": "turbo -F @env-manager/db db:generate",
-		"db:migrate": "turbo -F @env-manager/db db:migrate",
-		"check": "biome check --write .",
-		"format": "biome format --write .",
-		"lint": "biome lint .",
-		"fix": "biome check --write --unsafe .",
-		"prepare": "husky",
-		"release": "./scripts/release.sh",
-		"release:patch": "./scripts/release.sh patch",
-		"release:minor": "./scripts/release.sh minor",
-		"release:major": "./scripts/release.sh major",
-		"version-check": "node -p \"require('./package.json').version\"",
-		"changelog-check": "type CHANGELOG.md | more"
-	},
-	"dependencies": {
-		"@env-manager/env": "workspace:*",
-		"dotenv": "catalog:",
-		"zod": "catalog:"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.2.0",
-		"@env-manager/config": "workspace:*",
-		"@types/node": "^22.13.14",
-		"husky": "^9.1.7",
-		"lint-staged": "^16.1.2",
-		"turbo": "^2.6.3",
-		"typescript": "catalog:"
-	},
-	"lint-staged": {
-		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
-			"biome check --write ."
-		]
-	},
-	"packageManager": "pnpm@10.13.1"
+  "name": "env-manager",
+  "version": "1.0.2",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "db:push": "turbo -F @env-manager/db db:push",
+    "db:studio": "turbo -F @env-manager/db db:studio",
+    "db:generate": "turbo -F @env-manager/db db:generate",
+    "db:migrate": "turbo -F @env-manager/db db:migrate",
+    "check": "biome check --write .",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "fix": "biome check --write --unsafe .",
+    "prepare": "husky",
+    "release": "./scripts/release.sh",
+    "release:patch": "./scripts/release.sh patch",
+    "release:minor": "./scripts/release.sh minor",
+    "release:major": "./scripts/release.sh major",
+    "version-check": "node -p \"require('./package.json').version\"",
+    "changelog-check": "type CHANGELOG.md | more"
+  },
+  "dependencies": {
+    "@env-manager/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@env-manager/config": "workspace:*",
+    "@types/node": "^22.13.14",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
+    "turbo": "^2.6.3",
+    "typescript": "catalog:"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --write ."
+    ]
+  },
+  "packageManager": "pnpm@10.13.1"
 }
