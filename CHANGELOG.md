@@ -30,13 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.3.0] - 2026-01-19
 
 ### Changed
 
 - Improved landing page UI with modern hero section and better messaging
-- Enhanced sign-in form styling and layout
+- Enhanced sign-in form styling and layout for better user experience
 - Updated various UI components for better user experience
+
+## [Unreleased]
 
 ## [1.2.0] - 2026-01-19
 
