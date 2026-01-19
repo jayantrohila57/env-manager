@@ -15,13 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CHANGELOG.md with proper formatting
 - Environment validation skip option via SKIP_ENV_VALIDATION flag
 
+### Fixed
+
+- Fixed turbo.json configuration with duplicate build tasks
+- Updated environment validation logic to use string comparison
+- Resolved Vercel build environment variable issues
+
 ### Changed
 
 ### Deprecated
 
 ### Removed
-
-### Fixed
 
 ### Security
 
