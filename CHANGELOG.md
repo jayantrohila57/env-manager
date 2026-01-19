@@ -32,6 +32,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-01-19
+
+### Added
+- Comprehensive Environment Management Dashboard
+- Project Management: Create, edit, and delete projects with Card-based UI
+- Environment Management: Multi-environment support with Tab-based navigation
+- Advanced Variable Editor: Masked/Reveal values, Copy to Clipboard functionality
+- Bulk Variable Management: Import multiple variables from .env paste; Export to clipboard
+- Real-time Variable Search and Filtering by key
+- Core API: Added `bulkImport` and `export` endpoints for environment variables
+- UI: Refactored Header with centralized `siteConfig` and glassmorphism styling
+- UI: Interactive micro-animations and loading states with Skeleton components
+
+### Fixed
+- Critical bug in `variables.update` mutation preventing unintentional data overwrites
+
+### Changed
+- Centralized Branding: Integrated `siteConfig` across the application header
+- Migrated Dashboard to a project-centric view
+
 ## [1.0.2] - 2025-01-19
 
 ### Added

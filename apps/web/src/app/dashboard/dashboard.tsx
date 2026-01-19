@@ -1,19 +1,24 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
 
+import { ProjectList } from "@/components/projects";
 import type { authClient } from "@/lib/auth-client";
-import { trpc } from "@/utils/trpc";
 
 export default function Dashboard({
   session,
 }: {
   session: typeof authClient.$Infer.Session;
 }) {
-  const privateData = useQuery(trpc.privateData.queryOptions());
-
   return (
-    <p>
-      API: {privateData.data?.message} {JSON.stringify(session)}
-    </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-bold text-2xl">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Welcome back, {session.user.name}
+          </p>
+        </div>
+      </div>
+      <ProjectList />
+    </div>
   );
 }

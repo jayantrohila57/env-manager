@@ -1,3 +1,4 @@
+import { decrypt, encrypt } from "@env-manager/crypto";
 import { db } from "@env-manager/db";
 import {
   environment,
@@ -9,72 +10,40 @@ import { z } from "zod/v3";
 
 import { protectedProcedure, router } from "../index";
 import {
-  createEnvironmentInput,
-  environmentOutput,
-  environmentWithVariablesOutput,
-  getEnvironmentInput,
-  listEnvironmentsInput,
+  bulkImportResultOutput,
+  bulkImportVariablesInput,
+  createVariableInput,
+  exportVariablesInput,
+  exportVariablesOutput,
+  getVariableInput,
   makeResponseSchema,
   respond,
-  updateEnvironmentInput,
+  updateVariableInput,
+  variableOutput,
+  variableWithDecryptedValueOutput,
 } from "../validation";
 
 export const environmentVariablesRouter = router({
+  // List variables for an environment (metadata only)
   list: protectedProcedure
-    .input(listEnvironmentsInput)
-    .output(makeResponseSchema(z.array(environmentOutput)))
+    .input(z.object({ environmentId: z.string().uuid() }))
+    .output(makeResponseSchema(z.array(variableOutput)))
     .query(async ({ ctx, input }) => {
-      const ownsProject = await db
-        .select({ id: project.id })
-        .from(project)
-        .where(
-          and(
-            eq(project.id, input.projectId),
-            eq(project.userId, ctx.session.user.id),
-          ),
-        )
-        .limit(1);
-
-      if (!ownsProject.length) {
-        return respond({ message: "Project not found", data: [] });
-      }
-
-      const environments = await db
-        .select()
-        .from(environment)
-        .where(eq(environment.projectId, input.projectId))
-        .orderBy(environment.name);
-
-      return respond({ message: "Environments fetched", data: environments });
-    }),
-
-  get: protectedProcedure
-    .input(getEnvironmentInput)
-    .output(makeResponseSchema(environmentWithVariablesOutput))
-    .query(async ({ ctx, input }) => {
-      const env = await db
-        .select({
-          id: environment.id,
-          name: environment.name,
-          projectId: environment.projectId,
-          createdAt: environment.createdAt,
-          updatedAt: environment.updatedAt,
-        })
+      // Verify ownership through project
+      const hasAccess = await db
+        .select({ id: environment.id })
         .from(environment)
         .innerJoin(project, eq(environment.projectId, project.id))
         .where(
           and(
-            eq(environment.id, input.id),
+            eq(environment.id, input.environmentId),
             eq(project.userId, ctx.session.user.id),
           ),
         )
         .limit(1);
 
-      if (!env.length) {
-        return respond({
-          message: "Environment not found",
-          data: { environment: null, variables: [] },
-        });
+      if (!hasAccess.length) {
+        return respond({ message: "Environment not found", data: [] });
       }
 
       const variables = await db
@@ -86,116 +55,297 @@ export const environmentVariablesRouter = router({
           updatedAt: environmentVariable.updatedAt,
         })
         .from(environmentVariable)
-        .where(eq(environmentVariable.environmentId, input.id))
+        .where(eq(environmentVariable.environmentId, input.environmentId))
         .orderBy(environmentVariable.key);
 
-      const environmentRecord = env[0];
+      return respond({ message: "Variables fetched", data: variables });
+    }),
 
-      if (!environmentRecord) {
-        return respond({
-          message: "Environment not found",
-          data: { environment: null, variables: [] },
-        });
+  // Get a single variable with decrypted value
+  get: protectedProcedure
+    .input(getVariableInput)
+    .output(makeResponseSchema(variableWithDecryptedValueOutput.nullable()))
+    .query(async ({ ctx, input }) => {
+      const data = await db
+        .select({
+          id: environmentVariable.id,
+          key: environmentVariable.key,
+          encryptedValue: environmentVariable.encryptedValue,
+          environmentId: environmentVariable.environmentId,
+          createdAt: environmentVariable.createdAt,
+          updatedAt: environmentVariable.updatedAt,
+        })
+        .from(environmentVariable)
+        .innerJoin(
+          environment,
+          eq(environmentVariable.environmentId, environment.id),
+        )
+        .innerJoin(project, eq(environment.projectId, project.id))
+        .where(
+          and(
+            eq(environmentVariable.id, input.id),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      const record = data[0];
+      if (!record) {
+        return respond({ message: "Variable not found", data: null });
       }
 
       return respond({
-        message: "Environment fetched",
-        data: { environment: environmentRecord, variables },
+        message: "Variable fetched",
+        data: {
+          ...record,
+          value: decrypt(record.encryptedValue),
+        },
       });
     }),
 
+  // Create a new variable
   create: protectedProcedure
-    .input(createEnvironmentInput)
-    .output(makeResponseSchema(environmentOutput.nullable()))
+    .input(createVariableInput)
+    .output(makeResponseSchema(variableOutput.nullable()))
     .mutation(async ({ ctx, input }) => {
-      const ownsProject = await db
-        .select({ id: project.id })
-        .from(project)
-        .where(
-          and(
-            eq(project.id, input.projectId),
-            eq(project.userId, ctx.session.user.id),
-          ),
-        )
-        .limit(1);
-
-      if (!ownsProject.length) {
-        return respond({ message: "Project not found", data: null });
-      }
-
-      const [env] = await db
-        .insert(environment)
-        .values({
-          id: crypto.randomUUID(),
-          name: input.name,
-          projectId: input.projectId,
-        })
-        .returning();
-
-      if (!env) {
-        return respond({ message: "Failed to create environment", data: null });
-      }
-
-      return respond({ message: "Environment created", data: env });
-    }),
-
-  update: protectedProcedure
-    .input(updateEnvironmentInput)
-    .output(makeResponseSchema(environmentOutput.nullable()))
-    .mutation(async ({ ctx, input }) => {
-      const exists = await db
+      // Verify user owns the environment
+      const hasAccess = await db
         .select({ id: environment.id })
         .from(environment)
         .innerJoin(project, eq(environment.projectId, project.id))
         .where(
           and(
-            eq(environment.id, input.id),
+            eq(environment.id, input.environmentId),
             eq(project.userId, ctx.session.user.id),
           ),
         )
         .limit(1);
 
-      if (!exists.length) {
+      if (!hasAccess.length) {
         return respond({ message: "Environment not found", data: null });
       }
 
-      const [updated] = await db
-        .update(environment)
-        .set({
-          ...(input.name && { name: input.name }),
+      const [newVariable] = await db
+        .insert(environmentVariable)
+        .values({
+          id: crypto.randomUUID(),
+          key: input.key,
+          encryptedValue: encrypt(input.value),
+          environmentId: input.environmentId,
         })
-        .where(eq(environment.id, input.id))
         .returning();
 
-      if (!updated) {
-        return respond({ message: "Failed to update environment", data: null });
+      if (!newVariable) {
+        return respond({ message: "Failed to create variable", data: null });
       }
 
-      return respond({ message: "Environment updated", data: updated });
+      return respond({ message: "Variable created", data: newVariable });
     }),
 
-  delete: protectedProcedure
-    .input(getEnvironmentInput)
-    .output(z.object({ success: z.boolean() }))
+  // Update a variable
+  update: protectedProcedure
+    .input(updateVariableInput)
+    .output(makeResponseSchema(variableOutput.nullable()))
     .mutation(async ({ ctx, input }) => {
-      const exists = await db
-        .select({ id: environment.id })
-        .from(environment)
+      // Verify ownership
+      const existing = await db
+        .select({ id: environmentVariable.id })
+        .from(environmentVariable)
+        .innerJoin(
+          environment,
+          eq(environmentVariable.environmentId, environment.id),
+        )
         .innerJoin(project, eq(environment.projectId, project.id))
         .where(
           and(
-            eq(environment.id, input.id),
+            eq(environmentVariable.id, input.id),
             eq(project.userId, ctx.session.user.id),
           ),
         )
         .limit(1);
 
-      if (!exists.length) {
+      if (!existing.length) {
+        return respond({ message: "Variable not found", data: null });
+      }
+
+      const updateData: { key?: string; encryptedValue?: string } = {};
+      if (input.key) updateData.key = input.key;
+      if (input.value) updateData.encryptedValue = encrypt(input.value);
+
+      const [updated] = await db
+        .update(environmentVariable)
+        .set(updateData)
+        .where(eq(environmentVariable.id, input.id))
+        .returning();
+
+      if (!updated) {
+        return respond({ message: "Failed to update variable", data: null });
+      }
+
+      return respond({ message: "Variable updated", data: updated });
+    }),
+
+  // Delete a variable
+  delete: protectedProcedure
+    .input(getVariableInput)
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      // Verify ownership
+      const existing = await db
+        .select({ id: environmentVariable.id })
+        .from(environmentVariable)
+        .innerJoin(
+          environment,
+          eq(environmentVariable.environmentId, environment.id),
+        )
+        .innerJoin(project, eq(environment.projectId, project.id))
+        .where(
+          and(
+            eq(environmentVariable.id, input.id),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (!existing.length) {
         return { success: false };
       }
 
-      await db.delete(environment).where(eq(environment.id, input.id));
+      await db
+        .delete(environmentVariable)
+        .where(eq(environmentVariable.id, input.id));
 
       return { success: true };
+    }),
+
+  // Bulk import variables (supports .env file style imports)
+  bulkImport: protectedProcedure
+    .input(bulkImportVariablesInput)
+    .output(makeResponseSchema(bulkImportResultOutput))
+    .mutation(async ({ ctx, input }) => {
+      // Verify user owns the environment
+      const hasAccess = await db
+        .select({ id: environment.id })
+        .from(environment)
+        .innerJoin(project, eq(environment.projectId, project.id))
+        .where(
+          and(
+            eq(environment.id, input.environmentId),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (!hasAccess.length) {
+        return respond({
+          message: "Environment not found",
+          data: { created: 0, updated: 0, skipped: 0 },
+        });
+      }
+
+      // Get existing variables for this environment
+      const existingVars = await db
+        .select({
+          id: environmentVariable.id,
+          key: environmentVariable.key,
+        })
+        .from(environmentVariable)
+        .where(eq(environmentVariable.environmentId, input.environmentId));
+
+      const existingKeyMap = new Map(existingVars.map((v) => [v.key, v.id]));
+
+      let created = 0;
+      let updated = 0;
+      let skipped = 0;
+
+      for (const variable of input.variables) {
+        const existingId = existingKeyMap.get(variable.key);
+
+        if (existingId) {
+          if (input.overwrite) {
+            await db
+              .update(environmentVariable)
+              .set({ encryptedValue: encrypt(variable.value) })
+              .where(eq(environmentVariable.id, existingId));
+            updated++;
+          } else {
+            skipped++;
+          }
+        } else {
+          await db.insert(environmentVariable).values({
+            id: crypto.randomUUID(),
+            key: variable.key,
+            encryptedValue: encrypt(variable.value),
+            environmentId: input.environmentId,
+          });
+          created++;
+        }
+      }
+
+      return respond({
+        message: `Imported ${created} new, updated ${updated}, skipped ${skipped} variables`,
+        data: { created, updated, skipped },
+      });
+    }),
+
+  // Export variables as .env format string
+  export: protectedProcedure
+    .input(exportVariablesInput)
+    .output(makeResponseSchema(exportVariablesOutput))
+    .query(async ({ ctx, input }) => {
+      // Verify user owns the environment
+      const hasAccess = await db
+        .select({ id: environment.id })
+        .from(environment)
+        .innerJoin(project, eq(environment.projectId, project.id))
+        .where(
+          and(
+            eq(environment.id, input.environmentId),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (!hasAccess.length) {
+        return respond({ message: "Environment not found", data: "" });
+      }
+
+      const variables = await db
+        .select({
+          key: environmentVariable.key,
+          encryptedValue: environmentVariable.encryptedValue,
+        })
+        .from(environmentVariable)
+        .where(eq(environmentVariable.environmentId, input.environmentId))
+        .orderBy(environmentVariable.key);
+
+      // Format as .env file (KEY=value with proper escaping)
+      const envContent = variables
+        .map((v) => {
+          const decryptedValue = decrypt(v.encryptedValue);
+          // Escape special characters and wrap in quotes if needed
+          const needsQuotes =
+            decryptedValue.includes(" ") ||
+            decryptedValue.includes('"') ||
+            decryptedValue.includes("'") ||
+            decryptedValue.includes("\n") ||
+            decryptedValue.includes("#");
+
+          if (needsQuotes) {
+            // Use double quotes and escape inner double quotes
+            const escaped = decryptedValue
+              .replace(/\\/g, "\\\\")
+              .replace(/"/g, '\\"')
+              .replace(/\n/g, "\\n");
+            return `${v.key}="${escaped}"`;
+          }
+          return `${v.key}=${decryptedValue}`;
+        })
+        .join("\n");
+
+      return respond({
+        message: `Exported ${variables.length} variables`,
+        data: envContent,
+      });
     }),
 });

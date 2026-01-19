@@ -2,9 +2,13 @@ import { auth } from "@env-manager/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import Dashboard from "./dashboard";
+import { ProjectDetail } from "./project-detail";
 
-export default async function DashboardPage() {
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -13,9 +17,11 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  const { id } = await params;
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <Dashboard session={session} />
+      <ProjectDetail projectId={id} />
     </div>
   );
 }

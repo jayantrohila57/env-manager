@@ -1,0 +1,17 @@
+{
+  "name": "@env-manager/crypto",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@env-manager/env": "workspace:*"
+  },
+  "devDependencies": {
+    "@env-manager/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

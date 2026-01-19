@@ -12,6 +12,7 @@
   "scripts": {},
   "dependencies": {
     "@env-manager/auth": "workspace:*",
+    "@env-manager/crypto": "workspace:*",
     "@env-manager/db": "workspace:*",
     "@env-manager/env": "workspace:*",
     "@trpc/client": "catalog:",

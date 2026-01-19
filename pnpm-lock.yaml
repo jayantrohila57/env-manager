@@ -178,6 +178,9 @@ importers:
       '@env-manager/auth':
         specifier: workspace:*
         version: link:../auth
+      '@env-manager/crypto':
+        specifier: workspace:*
+        version: link:../crypto
       '@env-manager/db':
         specifier: workspace:*
         version: link:../db
@@ -239,6 +242,19 @@ importers:
         version: 5.9.3
 
   packages/config: {}
+
+  packages/crypto:
+    dependencies:
+      '@env-manager/env':
+        specifier: workspace:*
+        version: link:../env
+    devDependencies:
+      '@env-manager/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
 
   packages/db:
     dependencies:
