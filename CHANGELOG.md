@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated release scripts with semantic versioning
 - Comprehensive documentation for development workflow
 - CHANGELOG.md with proper formatting
+- Environment validation skip option via SKIP_ENV_VALIDATION flag
 
 ### Changed
 

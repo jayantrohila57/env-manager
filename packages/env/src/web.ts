@@ -4,4 +4,5 @@ export const env = createEnv({
 	client: {},
 	runtimeEnv: {},
 	emptyStringAsUndefined: true,
+	skipValidation: Boolean(process.env.SKIP_ENV_VALIDATION),
 });
