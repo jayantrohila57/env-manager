@@ -14,6 +14,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,14 +41,15 @@ export function ProjectList() {
   const createMutation = useMutation(
     trpc.projects.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["projects", "list"] });
-        toast.success("Project created successfully");
+        // Force refetch of all queries
+        queryClient.invalidateQueries();
         setIsCreateOpen(false);
         setName("");
         setDescription("");
       },
       onError: (error) => {
-        toast.error(error.message);
+        // Error handling is managed by toast.promise
+        console.error(error);
       },
     }),
   );
@@ -50,10 +59,18 @@ export function ProjectList() {
       toast.error("Project name is required");
       return;
     }
-    createMutation.mutate({
-      name: name.trim(),
-      description: description.trim() || undefined,
-    });
+
+    toast.promise(
+      createMutation.mutateAsync({
+        name: name.trim(),
+        description: description.trim() || undefined,
+      }),
+      {
+        loading: "Creating project...",
+        success: "Project created successfully",
+        error: (err) => err.message,
+      },
+    );
   };
 
   if (projectsQuery.isLoading) {
@@ -125,16 +142,23 @@ export function ProjectList() {
       </div>
 
       {projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-          <h3 className="font-medium text-lg">No projects yet</h3>
-          <p className="mt-1 text-muted-foreground text-sm">
-            Create your first project to start managing environment variables.
-          </p>
-          <Button className="mt-4" onClick={() => setIsCreateOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Project
-          </Button>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Plus className="h-6 w-6" />
+            </EmptyMedia>
+            <EmptyTitle>No projects yet</EmptyTitle>
+            <EmptyDescription>
+              Create your first project to start managing environment variables.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button onClick={() => setIsCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Project
+            </Button>
+          </EmptyContent>
+        </Empty>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (

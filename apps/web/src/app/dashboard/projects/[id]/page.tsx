@@ -20,7 +20,7 @@ export default async function ProjectPage({
   const { id } = await params;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container relative z-10 mx-auto px-4 py-8">
       <ProjectDetail projectId={id} />
     </div>
   );

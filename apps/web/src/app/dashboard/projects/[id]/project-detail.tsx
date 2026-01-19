@@ -36,9 +36,7 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
   const createEnvMutation = useMutation(
     trpc.environments.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["projects", "get", { id: projectId }],
-        });
+        queryClient.invalidateQueries();
         toast.success("Environment created successfully");
         setIsCreateEnvOpen(false);
         setEnvName("");
@@ -160,14 +158,10 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
         </div>
       ) : (
         <Tabs value={currentTab} onValueChange={setActiveTab}>
-          <div className="flex items-center justify-between gap-4 border-b">
-            <TabsList className="h-auto bg-transparent p-0">
+          <div className="flex items-center justify-between gap-4">
+            <TabsList>
               {environments.map((env) => (
-                <TabsTrigger
-                  key={env.id}
-                  value={env.id}
-                  className="rounded-none border-transparent border-b-2 px-4 pb-3 data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                >
+                <TabsTrigger key={env.id} value={env.id}>
                   {env.name}
                 </TabsTrigger>
               ))}
@@ -216,7 +210,6 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
               </DialogContent>
             </Dialog>
           </div>
-
           {environments.map((env) => (
             <TabsContent key={env.id} value={env.id} className="mt-6">
               <EnvironmentPanel environment={env} />

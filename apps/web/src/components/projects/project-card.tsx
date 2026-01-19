@@ -54,7 +54,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const updateMutation = useMutation(
     trpc.projects.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["projects", "list"] });
+        queryClient.invalidateQueries();
         toast.success("Project updated successfully");
         setIsEditOpen(false);
       },
@@ -67,7 +67,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const deleteMutation = useMutation(
     trpc.projects.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["projects", "list"] });
+        queryClient.invalidateQueries();
         toast.success("Project deleted successfully");
         setIsDeleteOpen(false);
       },

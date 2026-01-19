@@ -32,6 +32,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,6 +70,9 @@ export function EnvironmentPanel({
   const queryClient = useQueryClient();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isEditEnvOpen, setIsEditEnvOpen] = useState(false);
+  const [isDeleteEnvOpen, setIsDeleteEnvOpen] = useState(false);
+  const [envName, setEnvName] = useState(environment.name);
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
   const [importText, setImportText] = useState("");
@@ -83,54 +94,80 @@ export function EnvironmentPanel({
   const createMutation = useMutation(
     trpc.environmentVariables.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["environmentVariables", "list"],
-        });
-        toast.success("Variable added");
+        queryClient.invalidateQueries();
         setIsAddOpen(false);
         setKey("");
         setValue("");
+        toast.success("Variable created successfully");
       },
-      onError: (error) => toast.error(error.message),
+      onError: (error) => {
+        toast.error(error.message);
+      },
     }),
   );
 
   const updateMutation = useMutation(
     trpc.environmentVariables.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["environmentVariables", "list"],
-        });
-        toast.success("Variable updated");
+        queryClient.invalidateQueries();
         setEditingVar(null);
+        toast.success("Variable updated successfully");
       },
-      onError: (error) => toast.error(error.message),
+      onError: (error) => {
+        toast.error(error.message);
+      },
     }),
   );
 
   const deleteMutation = useMutation(
     trpc.environmentVariables.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["environmentVariables", "list"],
-        });
-        toast.success("Variable deleted");
+        queryClient.invalidateQueries();
+        toast.success("Variable deleted successfully");
       },
-      onError: (error) => toast.error(error.message),
+      onError: (error) => {
+        toast.error(error.message);
+      },
     }),
   );
 
   const bulkImportMutation = useMutation(
     trpc.environmentVariables.bulkImport.mutationOptions({
       onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: ["environmentVariables", "list"],
-        });
-        toast.success(data.message);
+        queryClient.invalidateQueries();
         setIsImportOpen(false);
         setImportText("");
+        toast.success(data.message);
       },
-      onError: (error) => toast.error(error.message),
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const updateEnvironmentMutation = useMutation(
+    trpc.environments.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries();
+        toast.success("Environment updated successfully");
+        setIsEditEnvOpen(false);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const deleteEnvironmentMutation = useMutation(
+    trpc.environments.delete.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries();
+        toast.success("Environment deleted successfully");
+        setIsDeleteEnvOpen(false);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
     }),
   );
 
@@ -146,11 +183,18 @@ export function EnvironmentPanel({
       toast.error("Variable key is required");
       return;
     }
-    createMutation.mutate({
-      environmentId: environment.id,
-      key: key.trim(),
-      value: value,
-    });
+    toast.promise(
+      createMutation.mutateAsync({
+        environmentId: environment.id,
+        key: key.trim(),
+        value: value,
+      }),
+      {
+        loading: "Adding variable...",
+        success: "Variable added successfully",
+        error: (err) => err.message,
+      },
+    );
   };
 
   const handleImport = () => {
@@ -179,11 +223,18 @@ export function EnvironmentPanel({
       return;
     }
 
-    bulkImportMutation.mutate({
-      environmentId: environment.id,
-      variables,
-      overwrite,
-    });
+    toast.promise(
+      bulkImportMutation.mutateAsync({
+        environmentId: environment.id,
+        variables,
+        overwrite,
+      }),
+      {
+        loading: "Importing variables...",
+        success: (data) => data.message,
+        error: (err) => err.message,
+      },
+    );
   };
 
   const handleExport = async () => {
@@ -192,6 +243,37 @@ export function EnvironmentPanel({
       await navigator.clipboard.writeText(result.data.data);
       toast.success("Copied to clipboard as .env format");
     }
+  };
+
+  const handleUpdateEnvironment = () => {
+    if (!envName.trim()) {
+      toast.error("Environment name is required");
+      return;
+    }
+    toast.promise(
+      updateEnvironmentMutation.mutateAsync({
+        id: environment.id,
+        name: envName.trim(),
+      }),
+      {
+        loading: "Updating environment...",
+        success: "Environment updated successfully",
+        error: (err) => err.message,
+      },
+    );
+  };
+
+  const handleDeleteEnvironment = () => {
+    toast.promise(
+      deleteEnvironmentMutation.mutateAsync({
+        id: environment.id,
+      }),
+      {
+        loading: "Deleting environment...",
+        success: "Environment deleted successfully",
+        error: (err) => err.message,
+      },
+    );
   };
 
   const handleCopyValue = async (varId: string) => {
@@ -245,6 +327,40 @@ export function EnvironmentPanel({
 
   return (
     <div className="space-y-4">
+      {/* Environment Header */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold text-lg">{environment.name}</h2>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  className="h-8 w-8 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+                  variant="ghost"
+                  size="icon"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              }
+            />
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setIsEditEnvOpen(true)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Rename Environment
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setIsDeleteEnvOpen(true)}
+                className="text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Environment
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-1 items-center gap-2">
@@ -372,22 +488,40 @@ export function EnvironmentPanel({
 
       {/* Variables Table */}
       {variables.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-          <h3 className="font-medium text-lg">No variables yet</h3>
-          <p className="mt-1 text-muted-foreground text-sm">
-            Add variables manually or import from a .env file.
-          </p>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Plus className="h-6 w-6" />
+            </EmptyMedia>
+            <EmptyTitle>No variables yet</EmptyTitle>
+            <EmptyDescription>
+              Add variables manually or import from a .env file.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button onClick={() => setIsAddOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Variable
+            </Button>
+          </EmptyContent>
+        </Empty>
       ) : filteredVariables.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-          <h3 className="font-medium text-lg">No matches found</h3>
-          <p className="mt-1 text-muted-foreground text-sm">
-            No variables match your search query "{searchQuery}".
-          </p>
-          <Button variant="link" onClick={() => setSearchQuery("")}>
-            Clear search
-          </Button>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Plus className="h-6 w-6" />
+            </EmptyMedia>
+            <EmptyTitle>No matches found</EmptyTitle>
+            <EmptyDescription>
+              No variables match your search query "{searchQuery}".
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button variant="link" onClick={() => setSearchQuery("")}>
+              Clear search
+            </Button>
+          </EmptyContent>
+        </Empty>
       ) : (
         <div className="rounded-lg border">
           <Table>
@@ -470,7 +604,14 @@ export function EnvironmentPanel({
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() =>
-                              deleteMutation.mutate({ id: variable.id })
+                              toast.promise(
+                                deleteMutation.mutateAsync({ id: variable.id }),
+                                {
+                                  loading: "Deleting variable...",
+                                  success: "Variable deleted",
+                                  error: (err) => err.message,
+                                },
+                              )
                             }
                             className="text-destructive focus:text-destructive"
                           >
@@ -535,16 +676,89 @@ export function EnvironmentPanel({
             <Button
               onClick={() => {
                 if (editingVar) {
-                  updateMutation.mutate({
-                    id: editingVar.id,
-                    key: editingVar.key,
-                    value: editingVar.value,
-                  });
+                  toast.promise(
+                    updateMutation.mutateAsync({
+                      id: editingVar.id,
+                      key: editingVar.key,
+                      value: editingVar.value,
+                    }),
+                    {
+                      loading: "Updating variable...",
+                      success: "Variable updated",
+                      error: (err) => err.message,
+                    },
+                  );
                 }
               }}
               disabled={updateMutation.isPending}
             >
               {updateMutation.isPending ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Environment Dialog */}
+      <Dialog open={isEditEnvOpen} onOpenChange={setIsEditEnvOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename Environment</DialogTitle>
+            <DialogDescription>
+              Change the name of this environment.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="env-name">Name</Label>
+              <Input
+                id="env-name"
+                value={envName}
+                onChange={(e) => setEnvName(e.target.value)}
+                placeholder="staging"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditEnvOpen(false);
+                setEnvName(environment.name);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateEnvironment}
+              disabled={updateEnvironmentMutation.isPending}
+            >
+              {updateEnvironmentMutation.isPending ? "Updating..." : "Update"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Environment Dialog */}
+      <Dialog open={isDeleteEnvOpen} onOpenChange={setIsDeleteEnvOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Environment</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{environment.name}"? This will
+              also delete all variables in this environment and cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteEnvOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteEnvironment}
+              disabled={deleteEnvironmentMutation.isPending}
+            >
+              {deleteEnvironmentMutation.isPending ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

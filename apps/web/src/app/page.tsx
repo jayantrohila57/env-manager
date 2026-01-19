@@ -1,33 +1,26 @@
-"use client";
-import { useQuery } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
 
-import { trpc } from "@/utils/trpc";
-
-const TITLE_TEXT = "";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  const healthCheck = useQuery(trpc.healthCheck.queryOptions());
-
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-2">
-      <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
-      <div className="grid gap-6">
-        <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">API Status</h2>
-          <div className="flex items-center gap-2">
-            <div
-              className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
-            />
-            <span className="text-muted-foreground text-sm">
-              {healthCheck.isLoading
-                ? "Checking..."
-                : healthCheck.data
-                  ? "Connected"
-                  : "Disconnected"}
-            </span>
-          </div>
-        </section>
+    <section className="container mx-auto flex h-[90vh] items-center justify-center px-4 py-24">
+      <div className="mx-auto max-w-3xl space-y-6 text-center">
+        <h1 className="font-bold text-4xl tracking-tight sm:text-5xl">
+          Manage Environment
+          <span className="block text-primary">Variables with Confidence</span>
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Securely store, manage, and deploy environment variables across all
+          your projects from a single, reliable dashboard.
+        </p>
+        <div className="flex flex-col justify-center gap-3 pt-4 sm:flex-row">
+          <Button size="lg">
+            <Plus className="mr-2 h-4 w-4" />
+            Get Started
+          </Button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

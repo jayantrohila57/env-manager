@@ -40,9 +40,7 @@ export default function SignInForm() {
   }
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-md p-6">
-      <h1 className="mb-6 text-center font-bold text-3xl">Welcome Back</h1>
-
+    <div className="relative z-10 mx-auto w-full max-w-md">
       <Button
         type="button"
         className="w-full"
@@ -53,12 +51,7 @@ export default function SignInForm() {
       </Button>
 
       <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          className="text-indigo-600 hover:text-indigo-800"
-        >
-          Need an account? Sign Up
-        </Button>
+        <Button variant="link">Need an account? Sign Up</Button>
       </div>
     </div>
   );

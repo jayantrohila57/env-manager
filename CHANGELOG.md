@@ -32,9 +32,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Improved landing page UI with modern hero section and better messaging
+- Enhanced sign-in form styling and layout
+- Updated various UI components for better user experience
+
 ## [1.2.0] - 2026-01-19
 
 ### Added
+
 - Comprehensive Environment Management Dashboard
 - Project Management: Create, edit, and delete projects with Card-based UI
 - Environment Management: Multi-environment support with Tab-based navigation
@@ -46,9 +53,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UI: Interactive micro-animations and loading states with Skeleton components
 
 ### Fixed
+
 - Critical bug in `variables.update` mutation preventing unintentional data overwrites
 
 ### Changed
+
 - Centralized Branding: Integrated `siteConfig` across the application header
 - Migrated Dashboard to a project-centric view
 
