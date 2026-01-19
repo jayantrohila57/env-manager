@@ -1,0 +1,24 @@
+{
+	"name": "@env-manager/auth",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"dependencies": {
+		"@env-manager/db": "workspace:*",
+		"@env-manager/env": "workspace:*",
+		"better-auth": "catalog:",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@env-manager/config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

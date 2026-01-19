@@ -1,0 +1,3 @@
+{
+	"extends": "@env-manager/config/tsconfig.base.json"
+}

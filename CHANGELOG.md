@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial project setup
-- Version management workflow
+- Version management and commit workflow scripts
+- Automated release scripts with semantic versioning
+- Comprehensive documentation for development workflow
+- CHANGELOG.md with proper formatting
 
 ### Changed
 
