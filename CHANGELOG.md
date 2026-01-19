@@ -50,6 +50,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored `environment-panel.tsx` to integrate with templates and audit logs.
 - Centralized `trpc` utils for better type safety and TanStack Query integration.
 
+## [1.5.0] - 2026-01-20
+
+### Added
+
+- **Domain-Driven Architecture**: Refactored `apps/web/src` into a domain-centric structure (`auth`, `projects`, `environments`, `templates`, `audit`).
+- **Server Components Migration**: Converted all main pages (`login`, `dashboard`, `audit`, `templates`) to React Server Components (RSC).
+- **Dynamic Loading**: Implemented `next/dynamic` with dedicated skeleton loading states for all major feature views.
+- **Strict tRPC Invalidation**: Standardized on object-based `.queryKey()` invalidation for TanStack Query v5 compatibility.
+
+### Changed
+
+- Migrated 700+ line components into modular, hook-driven domain components.
+- Standardized interactive elements with explicit `type="button"` for linting compliance.
+- Improved error handling and loading states across all feature domains.
+
+### Removed
+
+- Redundant legacy components in `src/components/projects`, `src/components/templates`, etc.
+
 ## [Unreleased]
 
 ### Added

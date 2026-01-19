@@ -1,21 +1,45 @@
-import SignInForm from "@/components/sign-in-form";
+import { auth } from "@env-manager/auth";
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { AuthSkeleton } from "@/domain/auth/components/skeletons";
+import { siteConfig } from "@/lib/siteConfig";
 
-export default function LoginPage() {
+const SignInForm = dynamic(
+  () => import("@/domain/auth/components/sign-in-form"),
+  {
+    loading: () => <AuthSkeleton />,
+  },
+);
+
+export const metadata: Metadata = {
+  title: "Login",
+  description: `Sign in to ${siteConfig.name} to manage your environment variables.`,
+};
+
+export default async function LoginPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
-    <section className="container mx-auto flex h-[90vh] items-center justify-center px-4 py-24">
-      <div className="mx-auto max-w-3xl space-y-6 text-center">
-        <h1 className="font-bold text-4xl tracking-tight sm:text-5xl">
-          Welcome Back to
-          <span className="block text-primary">EnvManager</span>
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Sign in to access your environment variables and continue managing
-          your projects securely.
-        </p>
-        <div className="mx-auto max-w-md">
-          <SignInForm />
+    <div className="flex h-[80vh] items-center justify-center pt-24">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <div className="flex flex-col space-y-2 text-center">
+          <h1 className="font-semibold text-2xl tracking-tight">
+            Sign in to your account
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Welcome back to {siteConfig.name}
+          </p>
         </div>
+        <SignInForm />
       </div>
-    </section>
+    </div>
   );
 }

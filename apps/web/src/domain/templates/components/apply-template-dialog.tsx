@@ -1,9 +1,7 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LayoutTemplate } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { trpc } from "@/utils/trpc";
+import { useTemplates } from "../hooks/use-templates";
 
 export function ApplyTemplateDialog({
   environmentId,
@@ -30,30 +28,16 @@ export function ApplyTemplateDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
-  const queryClient = useQueryClient();
+  const { templates, applyTemplate, isApplying } = useTemplates();
 
-  const { data: templates } = useQuery(trpc.templates.list.queryOptions());
-
-  const applyTemplate = useMutation(
-    trpc.templates.applyTemplate.mutationOptions({
-      onSuccess: (data) => {
-        toast.success(data.message);
-        setOpen(false);
-        setSelectedTemplateId("");
-        queryClient.invalidateQueries();
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    }),
-  );
-
-  const handleApply = () => {
+  const handleApply = async () => {
     if (!selectedTemplateId) return;
-    applyTemplate.mutate({
+    await applyTemplate({
       environmentId,
       templateId: selectedTemplateId,
     });
+    setOpen(false);
+    setSelectedTemplateId("");
   };
 
   return (
@@ -83,12 +67,12 @@ export function ApplyTemplateDialog({
               <SelectValue placeholder="Select a template" />
             </SelectTrigger>
             <SelectContent>
-              {templates?.data.map((template) => (
+              {templates.map((template) => (
                 <SelectItem key={template.id} value={template.id}>
                   {template.name} ({template.variableCount} vars)
                 </SelectItem>
               ))}
-              {templates?.data.length === 0 && (
+              {templates.length === 0 && (
                 <div className="p-2 text-center text-muted-foreground text-sm">
                   No templates found
                 </div>
@@ -102,9 +86,9 @@ export function ApplyTemplateDialog({
           </Button>
           <Button
             onClick={handleApply}
-            disabled={!selectedTemplateId || applyTemplate.isPending}
+            disabled={!selectedTemplateId || isApplying}
           >
-            {applyTemplate.isPending ? "Applying..." : "Apply Template"}
+            {isApplying ? "Applying..." : "Apply Template"}
           </Button>
         </DialogFooter>
       </DialogContent>

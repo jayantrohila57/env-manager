@@ -3,18 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
-
 import { authClient } from "@/lib/auth-client";
-import Loader from "./loader";
-import { Button } from "./ui/button";
 
-export default function SignInForm() {
+export function useAuth() {
   const router = useRouter();
-
-  const { isPending: isSessionPending } = authClient.useSession();
+  const { isPending: isSessionLoading, data: session } =
+    authClient.useSession();
   const [isTransitionPending, startTransition] = useTransition();
 
-  const handleSubmit = () => {
+  const signInWithGithub = () => {
     startTransition(async () => {
       await authClient.signIn.social(
         {
@@ -35,24 +32,21 @@ export default function SignInForm() {
     });
   };
 
-  if (isSessionPending) {
-    return <Loader />;
-  }
+  const signOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+          toast.success("Signed out successfully");
+        },
+      },
+    });
+  };
 
-  return (
-    <div className="relative z-10 mx-auto w-full max-w-md">
-      <Button
-        type="button"
-        className="w-full"
-        onClick={handleSubmit}
-        disabled={isTransitionPending}
-      >
-        {isTransitionPending ? "Signing in..." : "Sign In with GitHub"}
-      </Button>
-
-      <div className="mt-4 text-center">
-        <Button variant="link">Need an account? Sign Up</Button>
-      </div>
-    </div>
-  );
+  return {
+    session,
+    isLoading: isSessionLoading || isTransitionPending,
+    signInWithGithub,
+    signOut,
+  };
 }
