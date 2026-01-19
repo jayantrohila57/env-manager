@@ -53,6 +53,7 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/utils/trpc";
+import { ApplyTemplateDialog } from "../templates/apply-template-dialog";
 
 interface Environment {
   id: string;
@@ -433,6 +434,8 @@ export function EnvironmentPanel({
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
+
+          <ApplyTemplateDialog environmentId={environment.id} />
 
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger

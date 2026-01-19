@@ -11,6 +11,7 @@ import UserMenu from "./user-menu";
 export default function Header() {
   const links: Array<{ to: string; label: string }> = [
     { to: "/dashboard", label: "Dashboard" },
+    { to: "/templates", label: "Templates" },
   ];
 
   return (

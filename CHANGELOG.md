@@ -30,25 +30,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.0] - 2026-01-19
+## [1.4.0] - 2026-01-19
+
+### Added
+
+- **Environment Templates**: Reusable templates for environment variables.
+  - Create and manage templates with default variables.
+  - Apply templates to project environments with conflict detection (skips existing keys).
+  - Bulk management UI for template variables.
+- **Audit Logs Enhancement**:
+  - Implemented server-side search by action and entity type.
+  - Added frontend search bar and project-based filtering for audit logs.
+  - Improved data security by removing `any` types in audit log tables.
 
 ### Changed
 
-- Improved landing page UI with modern hero section and better messaging
-- Enhanced sign-in form styling and layout for better user experience
-- Updated various UI components for better user experience
+- Landing page UI with modern hero section and better messaging.
+- Sign-in form styling and layout for better user experience.
+- Refactored `environment-panel.tsx` to integrate with templates and audit logs.
+- Centralized `trpc` utils for better type safety and TanStack Query integration.
 
 ## [Unreleased]
 
 ### Added
 
-- Audit Logs: Backend search functionality (filtering by action and entity type)
-- Audit Logs: Frontend Search bar and Project filtering dropdown
-
 ### Changed
-
-- Audit Logs: Refactored `AuditLogTable` to use strict types (removed `any`)
-- Audit Logs: Integrated real-time search with TRPC query
 
 ## [1.2.0] - 2026-01-19
 

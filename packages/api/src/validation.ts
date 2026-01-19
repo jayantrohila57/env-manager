@@ -158,3 +158,50 @@ export const listAuditLogsInput = z.object({
   limit: z.number().min(1).max(100).default(50),
   offset: z.number().min(0).default(0),
 });
+
+// Template schemas
+export const createTemplateInput = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().optional(),
+  variables: z.array(
+    z.object({
+      key: z.string().min(1).max(256),
+      value: z.string().optional().default(""),
+      description: z.string().optional(),
+    }),
+  ),
+});
+
+export const getTemplateInput = z.object({
+  id: z.string().uuid(),
+});
+
+export const listTemplatesOutput = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  variableCount: z.number(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export const templateWithVariablesOutput = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  variables: z.array(
+    z.object({
+      id: z.string(),
+      key: z.string(),
+      value: z.string(),
+      description: z.string().nullable(),
+    }),
+  ),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export const applyTemplateInput = z.object({
+  templateId: z.string().uuid(),
+  environmentId: z.string().uuid(),
+});
