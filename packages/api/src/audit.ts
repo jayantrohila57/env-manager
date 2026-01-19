@@ -1,0 +1,84 @@
+import { db } from "@env-manager/db";
+import { auditLog } from "@env-manager/db/schema/audit";
+import {
+  environment,
+  environmentVariable,
+} from "@env-manager/db/schema/projects";
+import { eq } from "drizzle-orm";
+
+export interface AuditLogData {
+  userId: string;
+  projectId?: string | null;
+  environmentId?: string | null;
+  variableId?: string | null;
+  action: "CREATE" | "UPDATE" | "DELETE" | "BULK_IMPORT" | "EXPORT";
+  entityType: "VARIABLE" | "ENVIRONMENT" | "PROJECT";
+  oldValue?: string | null;
+  newValue?: string | null;
+}
+
+export async function createAuditLog(data: AuditLogData) {
+  try {
+    await db.insert(auditLog).values({
+      id: crypto.randomUUID(),
+      userId: data.userId,
+      projectId: data.projectId || null,
+      environmentId: data.environmentId || null,
+      variableId: data.variableId || null,
+      action: data.action,
+      entityType: data.entityType,
+      oldValue: data.oldValue || null,
+      newValue: data.newValue || null,
+    });
+  } catch (error) {
+    console.error("Failed to create audit log:", error);
+    // Don't throw error to avoid breaking main operations
+  }
+}
+
+export async function getProjectEnvironmentIds(
+  environmentId: string,
+): Promise<{ projectId: string | null; environmentId: string } | null> {
+  try {
+    const result = await db.query.environment.findFirst({
+      where: eq(environment.id, environmentId),
+      columns: {
+        id: true,
+        projectId: true,
+      },
+    });
+
+    return result
+      ? { projectId: result.projectId, environmentId: result.id }
+      : null;
+  } catch (error) {
+    console.error("Failed to get environment details:", error);
+    return null;
+  }
+}
+
+export async function getVariableDetails(variableId: string) {
+  try {
+    const result = await db.query.environmentVariable.findFirst({
+      where: eq(environmentVariable.id, variableId),
+      columns: {
+        id: true,
+        key: true,
+        environmentId: true,
+      },
+      with: {
+        environment: {
+          columns: {
+            id: true,
+            projectId: true,
+          },
+        },
+      },
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Failed to get variable details:", error);
+    return null;
+  }
+}

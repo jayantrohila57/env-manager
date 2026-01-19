@@ -7,7 +7,7 @@ import {
 } from "@env-manager/db/schema/projects";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod/v3";
-
+import { createAuditLog, getProjectEnvironmentIds } from "../audit";
 import { protectedProcedure, router } from "../index";
 import {
   bulkImportResultOutput,
@@ -139,6 +139,23 @@ export const environmentVariablesRouter = router({
         return respond({ message: "Failed to create variable", data: null });
       }
 
+      // Create audit log
+      const envDetails = await getProjectEnvironmentIds(input.environmentId);
+      if (envDetails) {
+        await createAuditLog({
+          userId: ctx.session.user.id,
+          projectId: envDetails.projectId,
+          environmentId: envDetails.environmentId,
+          variableId: newVariable.id,
+          action: "CREATE",
+          entityType: "VARIABLE",
+          newValue: JSON.stringify({
+            key: input.key,
+            value: input.value,
+          }),
+        });
+      }
+
       return respond({ message: "Variable created", data: newVariable });
     }),
 
@@ -149,7 +166,12 @@ export const environmentVariablesRouter = router({
     .mutation(async ({ ctx, input }) => {
       // Verify ownership
       const existing = await db
-        .select({ id: environmentVariable.id })
+        .select({
+          id: environmentVariable.id,
+          key: environmentVariable.key,
+          encryptedValue: environmentVariable.encryptedValue,
+          environmentId: environmentVariable.environmentId,
+        })
         .from(environmentVariable)
         .innerJoin(
           environment,
@@ -168,6 +190,16 @@ export const environmentVariablesRouter = router({
         return respond({ message: "Variable not found", data: null });
       }
 
+      const existingVar = existing[0];
+      if (!existingVar) {
+        return respond({ message: "Variable not found", data: null });
+      }
+
+      const oldValue = {
+        key: existingVar.key,
+        value: decrypt(existingVar.encryptedValue),
+      };
+
       const updateData: { key?: string; encryptedValue?: string } = {};
       if (input.key) updateData.key = input.key;
       if (input.value) updateData.encryptedValue = encrypt(input.value);
@@ -182,6 +214,26 @@ export const environmentVariablesRouter = router({
         return respond({ message: "Failed to update variable", data: null });
       }
 
+      // Create audit log
+      const envDetails = await getProjectEnvironmentIds(
+        existingVar.environmentId,
+      );
+      if (envDetails) {
+        await createAuditLog({
+          userId: ctx.session.user.id,
+          projectId: envDetails.projectId,
+          environmentId: envDetails.environmentId,
+          variableId: input.id,
+          action: "UPDATE",
+          entityType: "VARIABLE",
+          oldValue: JSON.stringify(oldValue),
+          newValue: JSON.stringify({
+            key: input.key || existingVar.key,
+            value: input.value || decrypt(existingVar.encryptedValue),
+          }),
+        });
+      }
+
       return respond({ message: "Variable updated", data: updated });
     }),
 
@@ -192,7 +244,12 @@ export const environmentVariablesRouter = router({
     .mutation(async ({ ctx, input }) => {
       // Verify ownership
       const existing = await db
-        .select({ id: environmentVariable.id })
+        .select({
+          id: environmentVariable.id,
+          key: environmentVariable.key,
+          encryptedValue: environmentVariable.encryptedValue,
+          environmentId: environmentVariable.environmentId,
+        })
         .from(environmentVariable)
         .innerJoin(
           environment,
@@ -209,6 +266,30 @@ export const environmentVariablesRouter = router({
 
       if (!existing.length) {
         return { success: false };
+      }
+
+      const existingVar = existing[0];
+      if (!existingVar) {
+        return { success: false };
+      }
+
+      // Create audit log before deletion
+      const envDetails = await getProjectEnvironmentIds(
+        existingVar.environmentId,
+      );
+      if (envDetails) {
+        await createAuditLog({
+          userId: ctx.session.user.id,
+          projectId: envDetails.projectId,
+          environmentId: envDetails.environmentId,
+          variableId: input.id,
+          action: "DELETE",
+          entityType: "VARIABLE",
+          oldValue: JSON.stringify({
+            key: existingVar.key,
+            value: decrypt(existingVar.encryptedValue),
+          }),
+        });
       }
 
       await db
@@ -282,6 +363,23 @@ export const environmentVariablesRouter = router({
         }
       }
 
+      // Create audit log for bulk import
+      const envDetails = await getProjectEnvironmentIds(input.environmentId);
+      if (envDetails) {
+        await createAuditLog({
+          userId: ctx.session.user.id,
+          projectId: envDetails.projectId,
+          environmentId: envDetails.environmentId,
+          action: "BULK_IMPORT",
+          entityType: "VARIABLE",
+          newValue: JSON.stringify({
+            variables: input.variables,
+            overwrite: input.overwrite,
+            result: { created, updated, skipped },
+          }),
+        });
+      }
+
       return respond({
         message: `Imported ${created} new, updated ${updated}, skipped ${skipped} variables`,
         data: { created, updated, skipped },
@@ -342,6 +440,21 @@ export const environmentVariablesRouter = router({
           return `${v.key}=${decryptedValue}`;
         })
         .join("\n");
+
+      // Create audit log for export
+      const envDetails = await getProjectEnvironmentIds(input.environmentId);
+      if (envDetails) {
+        await createAuditLog({
+          userId: ctx.session.user.id,
+          projectId: envDetails.projectId,
+          environmentId: envDetails.environmentId,
+          action: "EXPORT",
+          entityType: "VARIABLE",
+          newValue: JSON.stringify({
+            variablesCount: variables.length,
+          }),
+        });
+      }
 
       return respond({
         message: `Exported ${variables.length} variables`,

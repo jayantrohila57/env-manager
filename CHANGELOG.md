@@ -40,6 +40,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Audit Logs: Backend search functionality (filtering by action and entity type)
+- Audit Logs: Frontend Search bar and Project filtering dropdown
+
+### Changed
+
+- Audit Logs: Refactored `AuditLogTable` to use strict types (removed `any`)
+- Audit Logs: Integrated real-time search with TRPC query
+
 ## [1.2.0] - 2026-01-19
 
 ### Added

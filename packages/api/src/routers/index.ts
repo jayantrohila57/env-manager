@@ -1,4 +1,5 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
+import { auditLogsRouter } from "./audit";
 import { environmentsRouter } from "./environments";
 import { projectsRouter } from "./projects";
 import { environmentVariablesRouter } from "./variables";
@@ -16,5 +17,6 @@ export const appRouter = router({
   projects: projectsRouter,
   environments: environmentsRouter,
   environmentVariables: environmentVariablesRouter,
+  auditLogs: auditLogsRouter,
 });
 export type AppRouter = typeof appRouter;

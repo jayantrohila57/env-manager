@@ -132,3 +132,29 @@ export const exportVariablesInput = z.object({
 });
 
 export const exportVariablesOutput = z.string();
+
+// Audit log schemas
+export const auditLogOutput = z.object({
+  id: z.string(),
+  userId: z.string(),
+  projectId: z.string().nullable(),
+  environmentId: z.string().nullable(),
+  variableId: z.string().nullable(),
+  action: z.string(),
+  entityType: z.string(),
+  oldValue: z.string().nullable(),
+  newValue: z.string().nullable(),
+  createdAt: z.date(),
+});
+
+export const listAuditLogsInput = z.object({
+  projectId: z.string().uuid().optional(),
+  environmentId: z.string().uuid().optional(),
+  action: z
+    .enum(["CREATE", "UPDATE", "DELETE", "BULK_IMPORT", "EXPORT"])
+    .optional(),
+  entityType: z.enum(["VARIABLE", "ENVIRONMENT", "PROJECT"]).optional(),
+  search: z.string().optional(),
+  limit: z.number().min(1).max(100).default(50),
+  offset: z.number().min(0).default(0),
+});

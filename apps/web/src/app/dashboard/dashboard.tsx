@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ProjectList } from "@/components/projects";
 import type { authClient } from "@/lib/auth-client";
 
@@ -17,6 +18,9 @@ export default function Dashboard({
             Welcome back, {session.user.name}
           </p>
         </div>
+        <Link href="/audit" className="text-primary text-sm hover:underline">
+          View Audit Logs
+        </Link>
       </div>
       <ProjectList />
     </div>
