@@ -42,14 +42,12 @@ export function ApplyTemplateDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button variant="outline" size="sm">
-            <LayoutTemplate className="mr-2 h-4 w-4" />
-            Apply Template
-          </Button>
-        }
-      />
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          <LayoutTemplate className="mr-2 h-4 w-4" />
+          Apply Template
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Apply Template</DialogTitle>

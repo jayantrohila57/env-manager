@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface CreateEnvironmentDialogProps {
-  onConfirm: (name: string) => Promise<any>;
+  onConfirm: (name: string) => Promise<void>;
   isPending: boolean;
   triggerText?: string;
 }
@@ -39,17 +39,15 @@ export function CreateEnvironmentDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button
-            variant={triggerText === "Add Environment" ? "outline" : "default"}
-            size={triggerText === "Add Environment" ? "sm" : "default"}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {triggerText}
-          </Button>
-        }
-      />
+      <DialogTrigger asChild>
+        <Button
+          variant={triggerText === "Add Environment" ? "outline" : "default"}
+          size={triggerText === "Add Environment" ? "sm" : "default"}
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          {triggerText}
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Environment</DialogTitle>

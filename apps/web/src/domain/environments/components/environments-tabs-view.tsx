@@ -12,7 +12,7 @@ interface EnvironmentsTabsViewProps {
   environments: Environment[];
   activeTab?: string;
   onTabChange: (id: string) => void;
-  onCreate: (name: string) => Promise<any>;
+  onCreate: (name: string) => Promise<void>;
   isCreating: boolean;
   children: (env: Environment) => React.ReactNode;
 }

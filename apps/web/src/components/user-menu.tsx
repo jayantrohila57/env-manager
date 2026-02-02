@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -10,13 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SignOutDropdownMenuItem } from "@/domain/auth/components/dropdown-sign-out";
 import { authClient } from "@/lib/auth-client";
-
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 
 export default function UserMenu() {
-  const router = useRouter();
+  const _router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
@@ -33,28 +35,15 @@ export default function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        {session.user.name}
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">{session.user.name}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-card">
         <DropdownMenuGroup>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => {
-              authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    router.push("/");
-                  },
-                },
-              });
-            }}
-          >
-            Sign Out
-          </DropdownMenuItem>
+          <SignOutDropdownMenuItem />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

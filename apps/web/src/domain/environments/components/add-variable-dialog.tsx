@@ -40,14 +40,12 @@ export function AddVariableDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Variable
-          </Button>
-        }
-      />
+      <DialogTrigger asChild>
+        <Button size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Add Variable
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Variable</DialogTitle>

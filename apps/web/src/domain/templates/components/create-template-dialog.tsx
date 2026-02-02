@@ -27,14 +27,12 @@ export function CreateTemplateDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Template
-          </Button>
-        }
-      />
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Template
+        </Button>
+      </DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>

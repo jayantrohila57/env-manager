@@ -73,6 +73,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Complete UI Component Library**: Added comprehensive shadcn/ui components including accordion, alert-dialog, aspect-ratio, avatar, breadcrumb, button-group, calendar, collapsible, command, context-menu, drawer, field, form, hover-card, input-group, input-otp, item, kbd, menubar, navigation-menu, pagination, progress, radio-group, sheet, sidebar, slider, spinner, switch, toggle-group, and toggle
+- **Enhanced Layout Components**: New shell component, app-sidebar with navigation, breadcrumbs, go-back functionality, and section-dashboard components
+- **Mobile Responsiveness**: Added use-mobile hooks for better mobile experience
+- **Navigation System**: Complete nav-header and nav-main components with improved navigation structure
+- **Enhanced Authentication**: GitHub login component and dropdown sign-out component
+- **Domain Architecture**: Auth domain components with better separation of concerns
+
+### Changed
+
+- **UI Modernization**: Updated existing UI components (badge, button, card, checkbox, dialog, dropdown-menu, empty, input, label, scroll-area, select, separator, skeleton, sonner, table, tabs, textarea, tooltip) with latest shadcn/ui patterns
+- **Component Structure**: Refactored header, mode-toggle, and user-menu components for better consistency
+- **Styling Updates**: Enhanced index.css and lib/utils.ts with improved utility functions
+- **Workspace Configuration**: Updated pnpm-workspace.yaml and pnpm-lock.yaml for new dependencies
+
+### Removed
+
+- **Legacy Page Components**: Removed old page.tsx and replaced with modern server component architecture
+- **Deprecated Auth Components**: Replaced sign-in-form, sign-in-view, and use-auth hook with new domain-driven architecture
+
 ### Changed
 
 ## [1.2.0] - 2026-01-19

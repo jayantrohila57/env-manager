@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 interface CreateProjectDialogProps {
-  onConfirm: (data: { name: string; description?: string }) => Promise<any>;
+  onConfirm: (data: { name: string; description?: string }) => Promise<void>;
   isPending: boolean;
 }
 
@@ -39,14 +39,12 @@ export function CreateProjectDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            New Project
-          </Button>
-        }
-      />
+      <DialogTrigger asChild>
+        <Button size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          New Project
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>

@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 
 import "../index.css";
-import Header from "@/components/header";
 import Providers from "@/components/providers";
 import { generateMetadata as generateSiteMetadata } from "@/lib/siteConfig";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = generateSiteMetadata();
@@ -26,15 +21,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${poppins.variable} antialiased`}>
         <Providers>
-          <div className="relative grid h-svh grid-rows-[auto_1fr]">
-            <Header />
-            {children}
+          {/* <div className="relative grid h-svh grid-rows-[auto_1fr]"> */}
+          {/* <Header /> */}
+          {children}
 
-            <div
+          {/* <div
               className="pointer-events-none absolute inset-0 z-0"
               style={{
                 backgroundImage: `
@@ -45,8 +38,8 @@ export default function RootLayout({
       `,
                 backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
               }}
-            />
-          </div>
+            /> */}
+          {/* </div> */}
         </Providers>
       </body>
     </html>

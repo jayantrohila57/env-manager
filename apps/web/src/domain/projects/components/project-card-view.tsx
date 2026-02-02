@@ -49,17 +49,15 @@ export function ProjectCardView({
             </CardTitle>
           </Link>
           <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              }
-            />
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onEdit}>
                 <Pencil className="mr-2 h-4 w-4" />

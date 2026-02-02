@@ -1,11 +1,9 @@
 "use client";
 
-import { Github } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/siteConfig";
 import { ModeToggle } from "./mode-toggle";
-import { Button } from "./ui/button";
 import UserMenu from "./user-menu";
 
 export default function Header() {
@@ -15,10 +13,10 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60">
+    <header className="container mx-auto flex h-full w-full items-center justify-between">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <span className="font-bold text-lg tracking-tight">
               {siteConfig.name}
             </span>
@@ -37,16 +35,6 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-2">
           <nav className="flex items-center gap-1">
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button variant="ghost" size="icon" className="h-9 w-9">
-                <Github className="h-4 w-4" />
-                <span className="sr-only">GitHub</span>
-              </Button>
-            </Link>
             <ModeToggle />
             <UserMenu />
           </nav>
