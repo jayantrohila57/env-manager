@@ -69,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Redundant legacy components in `src/components/projects`, `src/components/templates`, etc.
 
-## [Unreleased]
+## [1.6.0] - 2026-02-02
 
 ### Added
 
@@ -91,6 +91,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Legacy Page Components**: Removed old page.tsx and replaced with modern server component architecture
 - **Deprecated Auth Components**: Replaced sign-in-form, sign-in-view, and use-auth hook with new domain-driven architecture
+
+## [Unreleased]
+
+### Added
 
 ### Changed
 
