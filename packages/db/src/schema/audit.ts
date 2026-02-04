@@ -19,16 +19,24 @@ export const auditLog = pgTable(
     variableId: text("variable_id").references(() => environmentVariable.id, {
       onDelete: "cascade",
     }),
-    action: text("action").notNull(), // 'CREATE', 'UPDATE', 'DELETE', 'BULK_IMPORT', 'EXPORT'
-    entityType: text("entity_type").notNull(), // 'VARIABLE', 'ENVIRONMENT', 'PROJECT'
+    action: text("action").notNull(), // 'CREATE', 'UPDATE', 'DELETE', 'BULK_IMPORT', 'EXPORT', 'DEPLOY', 'ARCHIVE'
+    entityType: text("entity_type").notNull(), // 'VARIABLE', 'ENVIRONMENT', 'PROJECT', 'USER'
+    entitySlug: text("entity_slug"), // slug of the affected entity for easy identification
     oldValue: text("old_value"), // JSON of previous state
     newValue: text("new_value"), // JSON of new state
+    ipAddress: text("ip_address"), // user IP address for security
+    userAgent: text("user_agent"), // browser/client information
+    metadata: text("metadata"), // additional context as JSON
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     index("audit_log_userId_idx").on(table.userId),
     index("audit_log_projectId_idx").on(table.projectId),
+    index("audit_log_environmentId_idx").on(table.environmentId),
     index("audit_log_createdAt_idx").on(table.createdAt),
+    index("audit_log_action_idx").on(table.action),
+    index("audit_log_entityType_idx").on(table.entityType),
+    index("audit_log_entitySlug_idx").on(table.entitySlug),
   ],
 );
 

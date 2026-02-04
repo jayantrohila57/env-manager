@@ -15,6 +15,13 @@
       "when": 1768837326914,
       "tag": "0001_thankful_shape",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770196372619,
+      "tag": "0002_neat_ender_wiggin",
+      "breakpoints": true
     }
   ]
 }

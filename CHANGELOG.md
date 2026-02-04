@@ -148,6 +148,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Database schema regeneration after dropping all tables
+- Generated new migration (0002_neat_ender_wiggin.sql) with updated schema
+- Applied database migrations successfully with proper indexes and constraints
+
 ## [1.2.0] - 2026-01-19
 
 ### Added
