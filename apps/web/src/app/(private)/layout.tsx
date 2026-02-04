@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ModeToggle } from "@/components/mode-toggle";
 import Shell from "@/components/shell";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -11,6 +12,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { UserMenu } from "@/domain/auth/components/user-menu";
+import { siteConfig } from "@/lib/siteConfig";
 
 interface OrganizationLayoutProps {
   children: React.ReactNode;
@@ -35,8 +37,29 @@ export default function OrganizationLayout({
                 <div className="hidden md:block">
                   <Breadcrumbs />
                 </div>
+                <div className="flex w-full flex-row items-center gap-2 md:hidden">
+                  <Avatar>
+                    <AvatarImage
+                      src="/favicon/favicon.ico"
+                      alt={siteConfig.name}
+                    />
+                    <AvatarFallback>
+                      {siteConfig.name
+                        ? siteConfig.name.slice(0, 2).toUpperCase()
+                        : "NA"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">
+                      {siteConfig.name}
+                    </span>
+                    <span className="truncate text-xs">
+                      {siteConfig.description}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex w-full flex-row items-center justify-end gap-4">
+              <div className="flex w-auto flex-row items-center justify-end gap-4">
                 <ModeToggle />
                 <UserMenu />
               </div>

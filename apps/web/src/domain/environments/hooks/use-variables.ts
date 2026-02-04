@@ -1,9 +1,17 @@
 "use client";
 
+import type { variableOutput } from "@env-manager/api/validation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { trpc } from "@/utils/trpc";
+
+interface VariablesQueryResponse {
+  status: "success";
+  message: string;
+  data: variableOutput[];
+  error: string | null;
+}
 
 export function useVariables(environmentId: string) {
   const queryClient = useQueryClient();
@@ -15,56 +23,204 @@ export function useVariables(environmentId: string) {
 
   const createMutation = useMutation(
     trpc.environmentVariables.create.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        // Cancel any outgoing refetches
+        await queryClient.cancelQueries({
           queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
         });
-        toast.success("Variable created successfully");
+
+        // Snapshot the previous value
+        const previousVariables = queryClient.getQueryData(
+          trpc.environmentVariables.list.queryKey({ environmentId }),
+        ) as VariablesQueryResponse | undefined;
+
+        // Optimistically add the new variable
+        if (previousVariables?.data) {
+          const newVariable: variableOutput = {
+            id: `temp-${Date.now()}`,
+            key: variables.key,
+            environmentId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            {
+              ...previousVariables,
+              data: [...previousVariables.data, newVariable],
+            },
+          );
+        }
+
+        return { previousVariables };
       },
       onError: (error) => {
         toast.error(error.message);
+        // Rollback to the previous value
+        if (createMutation.context?.previousVariables) {
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            createMutation.context.previousVariables,
+          );
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success to ensure consistency
+        queryClient.invalidateQueries({
+          queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Variable created successfully");
       },
     }),
   );
 
   const updateMutation = useMutation(
     trpc.environmentVariables.update.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
           queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
         });
-        toast.success("Variable updated successfully");
+
+        const previousVariables = queryClient.getQueryData(
+          trpc.environmentVariables.list.queryKey({ environmentId }),
+        ) as VariablesQueryResponse | undefined;
+
+        // Optimistically update the variable
+        if (previousVariables?.data) {
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            {
+              ...previousVariables,
+              data: previousVariables.data.map((variable: variableOutput) =>
+                variable.id === variables.id
+                  ? { ...variable, ...variables, updatedAt: new Date() }
+                  : variable,
+              ),
+            },
+          );
+        }
+
+        return { previousVariables };
       },
       onError: (error) => {
         toast.error(error.message);
+        if (updateMutation.context?.previousVariables) {
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            updateMutation.context.previousVariables,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Variable updated successfully");
       },
     }),
   );
 
   const deleteMutation = useMutation(
     trpc.environmentVariables.delete.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
           queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
         });
-        toast.success("Variable deleted successfully");
+
+        const previousVariables = queryClient.getQueryData(
+          trpc.environmentVariables.list.queryKey({ environmentId }),
+        ) as VariablesQueryResponse | undefined;
+
+        // Optimistically remove the variable
+        if (previousVariables?.data) {
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            {
+              ...previousVariables,
+              data: previousVariables.data.filter(
+                (variable: variableOutput) => variable.id !== variables.id,
+              ),
+            },
+          );
+        }
+
+        return { previousVariables };
       },
       onError: (error) => {
         toast.error(error.message);
+        if (deleteMutation.context?.previousVariables) {
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            deleteMutation.context.previousVariables,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Variable deleted successfully");
       },
     }),
   );
 
   const bulkImportMutation = useMutation(
     trpc.environmentVariables.bulkImport.mutationOptions({
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
           queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
         });
-        toast.success(data.message);
+
+        const previousVariables = queryClient.getQueryData(
+          trpc.environmentVariables.list.queryKey({ environmentId }),
+        ) as VariablesQueryResponse | undefined;
+
+        // Optimistically add the new variables
+        if (previousVariables?.data) {
+          const newVariables: variableOutput[] = variables.variables.map(
+            (variable, index) => ({
+              id: `temp-bulk-${Date.now()}-${index}`,
+              key: variable.key,
+              environmentId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }),
+          );
+
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            {
+              ...previousVariables,
+              data: [...previousVariables.data, ...newVariables],
+            },
+          );
+        }
+
+        return { previousVariables };
       },
       onError: (error) => {
         toast.error(error.message);
+        if (bulkImportMutation.context?.previousVariables) {
+          queryClient.setQueryData(
+            trpc.environmentVariables.list.queryKey({ environmentId }),
+            bulkImportMutation.context.previousVariables,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.environmentVariables.list.queryKey({ environmentId }),
+        });
+      },
+      onSuccess: (data) => {
+        toast.success(data.message);
       },
     }),
   );

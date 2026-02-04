@@ -4,12 +4,18 @@ import { z } from "zod/v3";
 export const createProjectInput = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
+  repositoryUrl: z.string().url().optional(),
+  websiteUrl: z.string().url().optional(),
+  isPublic: z.boolean().default(false),
 });
 
 export const updateProjectInput = z.object({
   id: z.string(),
   name: z.string().min(1).max(100).optional(),
   description: z.string().optional(),
+  repositoryUrl: z.string().url().optional(),
+  websiteUrl: z.string().url().optional(),
+  isPublic: z.boolean().optional(),
 });
 
 export const getProjectInput = z.object({
@@ -87,8 +93,8 @@ export const projectOutput = z.object({
   repositoryUrl: z.string().nullable(),
   websiteUrl: z.string().nullable(),
   userId: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export const environmentOutput = z.object({
@@ -101,16 +107,16 @@ export const environmentOutput = z.object({
   isProduction: z.boolean(),
   description: z.string().nullable(),
   projectId: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export const variableOutput = z.object({
   id: z.string(),
   key: z.string(),
   environmentId: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export const variableWithValueOutput = z.object({

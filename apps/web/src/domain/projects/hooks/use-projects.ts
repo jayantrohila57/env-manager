@@ -11,14 +11,21 @@ interface ApiProject {
   name: string;
   slug: string;
   description: string | null;
-  status: string;
+  status: "active" | "inactive" | "maintenance";
   isArchived: boolean;
   isPublic: boolean;
   repositoryUrl: string | null;
   websiteUrl: string | null;
   userId: string;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ProjectsQueryResponse {
+  status: "success";
+  message: string;
+  data: ApiProject[];
+  error: string | null;
 }
 
 // Helper function to transform API response to proper ProjectOutput type
@@ -26,8 +33,14 @@ function transformProject(project: ApiProject): ProjectOutput {
   return {
     ...project,
     status: project.status as "active" | "inactive" | "maintenance",
-    createdAt: new Date(project.createdAt),
-    updatedAt: new Date(project.updatedAt),
+    createdAt:
+      typeof project.createdAt === "string"
+        ? new Date(project.createdAt)
+        : project.createdAt,
+    updatedAt:
+      typeof project.updatedAt === "string"
+        ? new Date(project.updatedAt)
+        : project.updatedAt,
   };
 }
 
@@ -37,98 +50,340 @@ export function useProjects() {
 
   const createMutation = useMutation(
     trpc.projects.create.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
+        // Optimistically update the cache with the new project
+        queryClient.setQueryData(
+          trpc.projects.list.queryKey(),
+          (old: unknown) => {
+            if (!old || typeof old !== "object" || !("data" in old)) return old;
+            const oldData = old as { data: unknown[] };
+            return {
+              ...oldData,
+              data: [...oldData.data, transformProject(data.data)],
+            };
+          },
+        );
+
+        // Invalidate related queries to ensure consistency
         queryClient.invalidateQueries({
           queryKey: trpc.projects.list.queryKey(),
         });
+
         toast.success("Project created successfully");
       },
       onError: (error) => {
         toast.error(error.message);
+        // Refetch to ensure cache consistency after error
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
       },
     }),
   );
 
   const updateMutation = useMutation(
     trpc.projects.update.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        // Cancel any outgoing refetches
+        await queryClient.cancelQueries({
           queryKey: trpc.projects.list.queryKey(),
         });
-        toast.success("Project updated successfully");
+
+        // Snapshot the previous value
+        const previousProjects = queryClient.getQueryData(
+          trpc.projects.list.queryKey(),
+        ) as unknown;
+
+        // Optimistically update to the new value
+        queryClient.setQueryData(
+          trpc.projects.list.queryKey(),
+          (old: unknown) => {
+            if (!old || typeof old !== "object" || !("data" in old)) return old;
+            const oldData = old as { data: unknown[] };
+            return {
+              ...oldData,
+              data: oldData.data.map((project: unknown) => {
+                if (typeof project === "object" && project && "id" in project) {
+                  const proj = project as { id: string };
+                  return proj.id === variables.id
+                    ? { ...proj, ...variables }
+                    : proj;
+                }
+                return project;
+              }),
+            };
+          },
+        );
+
+        return { previousProjects };
       },
       onError: (error) => {
         toast.error(error.message);
+        // Rollback to the previous value
+        if (updateMutation.context?.previousProjects) {
+          queryClient.setQueryData(
+            trpc.projects.list.queryKey(),
+            updateMutation.context.previousProjects,
+          );
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Project updated successfully");
       },
     }),
   );
 
   const deleteMutation = useMutation(
     trpc.projects.delete.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        // Cancel any outgoing refetches
+        await queryClient.cancelQueries({
           queryKey: trpc.projects.list.queryKey(),
         });
-        toast.success("Project deleted successfully");
+
+        // Snapshot the previous value
+        const previousProjects = queryClient.getQueryData(
+          trpc.projects.list.queryKey(),
+        ) as unknown;
+
+        // Optimistically remove the deleted project
+        queryClient.setQueryData(
+          trpc.projects.list.queryKey(),
+          (old: unknown) => {
+            if (!old || typeof old !== "object" || !("data" in old)) return old;
+            const oldData = old as { data: unknown[] };
+            return {
+              ...oldData,
+              data: oldData.data.filter((project: unknown) => {
+                if (typeof project === "object" && project && "id" in project) {
+                  const proj = project as { id: string };
+                  return proj.id !== variables.id;
+                }
+                return true;
+              }),
+            };
+          },
+        );
+
+        return { previousProjects };
       },
       onError: (error) => {
         toast.error(error.message);
+        // Rollback to the previous value
+        if (deleteMutation.context?.previousProjects) {
+          queryClient.setQueryData(
+            trpc.projects.list.queryKey(),
+            deleteMutation.context.previousProjects,
+          );
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Project deleted successfully");
       },
     }),
   );
 
   const archiveMutation = useMutation(
     trpc.projects.archive.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
           queryKey: trpc.projects.list.queryKey(),
         });
-        toast.success("Project archived successfully");
+
+        const previousProjects = queryClient.getQueryData(
+          trpc.projects.list.queryKey(),
+        ) as ProjectsQueryResponse | undefined;
+
+        queryClient.setQueryData(
+          trpc.projects.list.queryKey(),
+          (old: ProjectsQueryResponse | undefined) => {
+            if (!old?.data) return old;
+            return {
+              ...old,
+              data: old.data.map((project: ApiProject) =>
+                project.id === variables.id
+                  ? { ...project, isArchived: true }
+                  : project,
+              ),
+            };
+          },
+        );
+
+        return { previousProjects };
       },
       onError: (error) => {
         toast.error(error.message);
+        if (archiveMutation.context?.previousProjects) {
+          queryClient.setQueryData(
+            trpc.projects.list.queryKey(),
+            archiveMutation.context.previousProjects,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Project archived successfully");
       },
     }),
   );
 
   const unarchiveMutation = useMutation(
     trpc.projects.unarchive.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
           queryKey: trpc.projects.list.queryKey(),
         });
-        toast.success("Project unarchived successfully");
+
+        const previousProjects = queryClient.getQueryData(
+          trpc.projects.list.queryKey(),
+        ) as ProjectsQueryResponse | undefined;
+
+        queryClient.setQueryData(
+          trpc.projects.list.queryKey(),
+          (old: ProjectsQueryResponse | undefined) => {
+            if (!old?.data) return old;
+            return {
+              ...old,
+              data: old.data.map((project: ApiProject) =>
+                project.id === variables.id
+                  ? { ...project, isArchived: false }
+                  : project,
+              ),
+            };
+          },
+        );
+
+        return { previousProjects };
       },
       onError: (error) => {
         toast.error(error.message);
+        if (unarchiveMutation.context?.previousProjects) {
+          queryClient.setQueryData(
+            trpc.projects.list.queryKey(),
+            unarchiveMutation.context.previousProjects,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Project unarchived successfully");
       },
     }),
   );
 
   const changeStatusMutation = useMutation(
     trpc.projects.changeStatus.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
           queryKey: trpc.projects.list.queryKey(),
         });
-        toast.success("Project status updated successfully");
+
+        const previousProjects = queryClient.getQueryData(
+          trpc.projects.list.queryKey(),
+        ) as ProjectsQueryResponse | undefined;
+
+        queryClient.setQueryData(
+          trpc.projects.list.queryKey(),
+          (old: ProjectsQueryResponse | undefined) => {
+            if (!old?.data) return old;
+            return {
+              ...old,
+              data: old.data.map((project: ApiProject) =>
+                project.id === variables.id
+                  ? { ...project, status: variables.status }
+                  : project,
+              ),
+            };
+          },
+        );
+
+        return { previousProjects };
       },
       onError: (error) => {
         toast.error(error.message);
+        if (changeStatusMutation.context?.previousProjects) {
+          queryClient.setQueryData(
+            trpc.projects.list.queryKey(),
+            changeStatusMutation.context.previousProjects,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Project status updated successfully");
       },
     }),
   );
 
   const togglePublicMutation = useMutation(
     trpc.projects.togglePublic.mutationOptions({
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
           queryKey: trpc.projects.list.queryKey(),
         });
-        toast.success(data.message);
+
+        const previousProjects = queryClient.getQueryData(
+          trpc.projects.list.queryKey(),
+        ) as ProjectsQueryResponse | undefined;
+
+        // Optimistically update the public status
+        queryClient.setQueryData(
+          trpc.projects.list.queryKey(),
+          (old: ProjectsQueryResponse | undefined) => {
+            if (!old?.data) return old;
+            return {
+              ...old,
+              data: old.data.map((project: ApiProject) =>
+                project.id === variables.id
+                  ? { ...project, isPublic: !project.isPublic }
+                  : project,
+              ),
+            };
+          },
+        );
+
+        return { previousProjects };
       },
       onError: (error) => {
         toast.error(error.message);
+        if (togglePublicMutation.context?.previousProjects) {
+          queryClient.setQueryData(
+            trpc.projects.list.queryKey(),
+            togglePublicMutation.context.previousProjects,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+      },
+      onSuccess: (data) => {
+        toast.success(data.message);
       },
     }),
   );

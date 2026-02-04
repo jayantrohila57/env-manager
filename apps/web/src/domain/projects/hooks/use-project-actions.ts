@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useProjects } from "./use-projects";
 
@@ -13,7 +14,7 @@ export function useProjectActions({
   projectId,
   onUpdate,
 }: UseProjectActionsProps) {
-  const queryClient = useQueryClient();
+  const router = useRouter();
 
   const {
     archiveProject,
@@ -37,13 +38,9 @@ export function useProjectActions({
     try {
       await archiveProject({ id: projectId });
       onUpdate?.();
-      // Invalidate both list and detail queries
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.list.queryKey(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.get.queryKey({ id: projectId }),
-      });
+
+      // Redirect to projects list after archiving
+      router.push("/dashboard/projects");
     } catch (error) {
       console.error("Archive failed:", error);
     }
@@ -53,12 +50,9 @@ export function useProjectActions({
     try {
       await unarchiveProject({ id: projectId });
       onUpdate?.();
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.list.queryKey(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.get.queryKey({ id: projectId }),
-      });
+
+      // Redirect to projects list after unarchiving
+      router.push("/dashboard/projects");
     } catch (error) {
       console.error("Unarchive failed:", error);
     }
@@ -70,12 +64,8 @@ export function useProjectActions({
     try {
       await changeProjectStatus({ id: projectId, status });
       onUpdate?.();
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.list.queryKey(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.get.queryKey({ id: projectId }),
-      });
+
+      // Stay on current page, just let the hook handle cache updates
     } catch (error) {
       console.error("Status change failed:", error);
     }
@@ -85,12 +75,8 @@ export function useProjectActions({
     try {
       await toggleProjectPublic({ id: projectId });
       onUpdate?.();
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.list.queryKey(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.get.queryKey({ id: projectId }),
-      });
+
+      // Stay on current page, just let the hook handle cache updates
     } catch (error) {
       console.error("Toggle public failed:", error);
     }
@@ -100,9 +86,9 @@ export function useProjectActions({
     try {
       await deleteProject({ id: projectId });
       onUpdate?.();
-      queryClient.invalidateQueries({
-        queryKey: trpc.projects.list.queryKey(),
-      });
+
+      // Redirect to projects list after deletion
+      router.push("/dashboard/projects");
     } catch (error) {
       console.error("Delete failed:", error);
     }

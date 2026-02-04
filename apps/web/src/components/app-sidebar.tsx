@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -22,7 +21,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { UserMenu } from "@/domain/auth/components/user-menu";
 import { useProjects } from "@/domain/projects/hooks/use-projects";
 import { siteConfig } from "@/lib/siteConfig";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
