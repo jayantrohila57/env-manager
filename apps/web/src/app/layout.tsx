@@ -23,12 +23,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.variable} antialiased`}>
         <Providers>
-          {/* <div className="relative grid h-svh grid-rows-[auto_1fr]"> */}
-          {/* <Header /> */}
-          {children}
-
-          {/* <div
-              className="pointer-events-none absolute inset-0 z-0"
+          <div className="relative z-10">
+            {children}
+            <div
+              className="pointer-events-none absolute inset-0 z-0 h-full"
               style={{
                 backgroundImage: `
         repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(75, 85, 99, 0.08) 19px, rgba(75, 85, 99, 0.08) 20px, transparent 20px, transparent 39px, rgba(75, 85, 99, 0.08) 39px, rgba(75, 85, 99, 0.08) 40px),
@@ -38,8 +36,8 @@ export default function RootLayout({
       `,
                 backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
               }}
-            /> */}
-          {/* </div> */}
+            />
+          </div>
         </Providers>
       </body>
     </html>
