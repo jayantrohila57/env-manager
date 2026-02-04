@@ -1,13 +1,16 @@
 "use client";
 
-import { Github, Globe } from "lucide-react";
+import { Folder, Github, Globe } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -16,12 +19,15 @@ import { EnvironmentPanel } from "../../environments/components/environment-pane
 import { EnvironmentsTabsView } from "../../environments/components/environments-tabs-view";
 import { ProjectDetailSkeleton } from "../../environments/components/skeletons";
 import { useEnvironments } from "../../environments/hooks/use-environments";
+import { ProjectActions } from "./project-actions";
 
 export default function ProjectDetail({
   projectSlug,
 }: {
   projectSlug: string;
 }) {
+  const [_refreshKey, setRefreshKey] = useState(0);
+
   const {
     project,
     environments,
@@ -32,6 +38,11 @@ export default function ProjectDetail({
     isCreating,
     projectId,
   } = useEnvironments(projectSlug);
+
+  const handleProjectUpdate = () => {
+    // Force refresh of project data
+    setRefreshKey((prev) => prev + 1);
+  };
 
   if (status === "loading") return <ProjectDetailSkeleton />;
   if (status === "error" || !project) {
@@ -49,41 +60,73 @@ export default function ProjectDetail({
     <div className="space-y-4">
       <Card className="bg-background">
         <CardHeader>
-          <CardTitle className="text-2xl">{project.name}</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-2xl">
+            <Folder className="h-6 w-6" />
+            Project Information
+          </CardTitle>
+          <CardAction>
+            <div className="flex items-center gap-3">
+              <ProjectActions
+                project={project}
+                onUpdate={handleProjectUpdate}
+              />
+            </div>
+          </CardAction>
+        </CardHeader>
+        <CardHeader>
+          <CardTitle>
+            {project.name}
+            {project.isPublic && <Badge variant="outline">Public</Badge>}
+            {project.isArchived && <Badge variant="secondary">Archived</Badge>}
+          </CardTitle>
           <CardDescription className="max-w-xl text-muted-foreground">
             {project.description}
           </CardDescription>
           <CardAction>
-            <div className="flex items-center gap-3">
-              {project.repositoryUrl && (
-                <Link
-                  href={project.repositoryUrl as Route}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  title="View Repository"
-                >
-                  <Button variant={"ghost"} size="icon">
-                    <Github className="h-4 w-4" />
-                  </Button>
-                </Link>
-              )}
-              {project.websiteUrl && (
-                <Link
-                  href={project.websiteUrl as Route}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  title="View Website"
-                >
-                  <Button variant={"ghost"} size="icon">
-                    <Globe className="h-4 w-4" />
-                  </Button>
-                </Link>
-              )}
-            </div>
+            <Badge
+              className="capitalize"
+              variant={
+                project.status === "active"
+                  ? "default"
+                  : project.status === "maintenance"
+                    ? "secondary"
+                    : "outline"
+              }
+            >
+              {project.status}
+            </Badge>
           </CardAction>
         </CardHeader>
+        <CardFooter>
+          {project.repositoryUrl && (
+            <Link
+              href={project.repositoryUrl as Route}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              title="View Repository"
+            >
+              <Button variant={"link"} size="default">
+                <Github className="h-4 w-4" />
+                <span className="ml-2 line-clamp-1">Github</span>
+              </Button>
+            </Link>
+          )}
+          {project.websiteUrl && (
+            <Link
+              href={project.websiteUrl as Route}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              title="View Website"
+            >
+              <Button variant={"link"} size="default">
+                <Globe className="h-4 w-4" />
+                <span className="ml-2 line-clamp-1">Website</span>
+              </Button>
+            </Link>
+          )}
+        </CardFooter>
       </Card>
       <Separator />
       <EnvironmentsTabsView

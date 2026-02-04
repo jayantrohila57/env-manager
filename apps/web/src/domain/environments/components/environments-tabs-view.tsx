@@ -1,6 +1,13 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { FileKey, Plus } from "lucide-react";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Empty,
   EmptyContent,
@@ -57,38 +64,50 @@ export function EnvironmentsTabsView({
   }
 
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange}>
-      <div className="flex items-center justify-between">
-        <TabsList variant={"line"}>
+    <Card className="bg-background">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-2xl">
+          <FileKey className="h-6 w-6" />
+          Environments
+        </CardTitle>
+        <CardAction>
+          <CreateEnvironmentDialog
+            onConfirm={onCreate}
+            isPending={isCreating}
+            triggerText="Add Environment"
+          />
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <Tabs value={activeTab} onValueChange={onTabChange}>
+          <div className="flex items-center justify-between">
+            <TabsList variant={"line"}>
+              {environments.map((env) => (
+                <TabsTrigger
+                  className={
+                    activeTab === env.id
+                      ? "rounded-none border-b-2 border-b-primary text-lg text-primary"
+                      : "rounded-none border-b-2 border-b-border text-lg"
+                  }
+                  key={env.id}
+                  value={env.id}
+                >
+                  {env.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
           {environments.map((env) => (
-            <TabsTrigger
-              className={
-                activeTab === env.id
-                  ? "rounded-none border-b-2 border-b-primary text-lg text-primary"
-                  : "rounded-none border-b-2 border-b-border text-lg"
-              }
+            <TabsContent
               key={env.id}
               value={env.id}
+              className="rounded-md border bg-input/10 p-4"
             >
-              {env.name}
-            </TabsTrigger>
+              {children(env)}
+            </TabsContent>
           ))}
-        </TabsList>
-        <CreateEnvironmentDialog
-          onConfirm={onCreate}
-          isPending={isCreating}
-          triggerText="Add Environment"
-        />
-      </div>
-      {environments.map((env) => (
-        <TabsContent
-          key={env.id}
-          value={env.id}
-          className="rounded-md border bg-input/10 p-4"
-        >
-          {children(env)}
-        </TabsContent>
-      ))}
-    </Tabs>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }

@@ -40,6 +40,15 @@ export const updateProjectInput = z.object({
   isPublic: z.boolean().optional(),
 });
 
+export const changeProjectStatusInput = z.object({
+  id: z.string().uuid(),
+  status: z.enum(["active", "inactive", "maintenance"]),
+});
+
+export const toggleProjectPublicInput = z.object({
+  id: z.string().uuid(),
+});
+
 export const getProjectInput = z.object({
   id: z.string().uuid(),
 });
@@ -57,7 +66,7 @@ export const projectOutput = z.object({
   isPublic: z.boolean(),
   repositoryUrl: z.string().nullable(),
   websiteUrl: z.string().nullable(),
-  status: z.string(),
+  status: z.enum(["active", "inactive", "maintenance"]),
   userId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -102,7 +111,7 @@ export const environmentOutput = z.object({
   slug: z.string(),
   branch: z.string().nullable(),
   deployedUrl: z.string().nullable(),
-  status: z.string(),
+  status: z.enum(["active", "inactive", "building", "failed"]),
   isProduction: z.boolean(),
   description: z.string().nullable(),
   projectId: z.string(),

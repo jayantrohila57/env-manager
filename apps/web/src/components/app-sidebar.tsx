@@ -1,6 +1,10 @@
 "use client";
 
-import { FolderClosedIcon, LayoutDashboardIcon } from "lucide-react";
+import {
+  FolderClosedIcon,
+  FolderIcon,
+  LayoutDashboardIcon,
+} from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,12 +23,14 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { UserMenu } from "@/domain/auth/components/user-menu";
+import { useProjects } from "@/domain/projects/hooks/use-projects";
 import { siteConfig } from "@/lib/siteConfig";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const { projects, status } = useProjects();
 
   useEffect(() => {
     setMounted(true);
@@ -97,16 +103,59 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Projects</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="flex flex-col gap-1">
+              {status === "loading" && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton disabled>
+                    <FolderIcon />
+                    <span>Loading projects...</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {status === "error" && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton disabled>
+                    <FolderIcon />
+                    <span>Error loading projects</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {status === "success" && projects.length === 0 && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton disabled>
+                    <FolderIcon />
+                    <span>No projects yet</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {status === "success" &&
+                projects.map((project) => (
+                  <SidebarMenuItem key={project.slug}>
+                    <SidebarMenuButton
+                      variant={
+                        isActive(`/dashboard/projects/${project.slug}`)
+                          ? "active"
+                          : "inActive"
+                      }
+                      isActive={isActive(`/dashboard/projects/${project.slug}`)}
+                      asChild
+                    >
+                      <Link
+                        href={`/dashboard/projects/${project.slug}` as Route}
+                      >
+                        <FolderIcon />
+                        <span>{project.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <UserMenu />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

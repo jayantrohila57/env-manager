@@ -21,6 +21,7 @@
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "next": "catalog:",
+    "superjson": "^2.2.6",
     "zod": "catalog:"
   },
   "devDependencies": {

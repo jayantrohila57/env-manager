@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod/v3";
 import { protectedProcedure, router } from "../index";
 import {
+  changeProjectStatusInput,
   createProjectInput,
   environmentOutput,
   getProjectBySlugInput,
@@ -12,6 +13,7 @@ import {
   makeResponseSchema,
   projectOutput,
   respond,
+  toggleProjectPublicInput,
   updateProjectInput,
 } from "../validation";
 
@@ -88,7 +90,7 @@ export const projectsRouter = router({
       return respond({
         message: "Project fetched",
         data: {
-          project: projectRecord ?? null,
+          project: projectRecord || null,
           environments: projectRecord ? environmentsList : [],
         },
       });
@@ -155,13 +157,13 @@ export const projectsRouter = router({
           updatedAt: environment.updatedAt,
         })
         .from(environment)
-        .where(eq(environment.projectId, projectData[0].id))
+        .where(eq(environment.projectId, projectData[0]?.id || ""))
         .orderBy(environment.name);
 
       return respond({
         message: "Project fetched",
         data: {
-          project: projectData[0],
+          project: projectData[0] || null,
           environments: environmentsList,
         },
       });
@@ -274,5 +276,163 @@ export const projectsRouter = router({
       await db.delete(project).where(eq(project.id, input.id));
 
       return respond({ message: "Project deleted", data: { success: true } });
+    }),
+
+  // Archive a project
+  archive: protectedProcedure
+    .input(getProjectInput)
+    .output(makeResponseSchema(projectOutput))
+    .mutation(async ({ ctx, input }) => {
+      const existingProject = await db
+        .select()
+        .from(project)
+        .where(
+          and(
+            eq(project.id, input.id),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (existingProject.length === 0) {
+        throw new Error("Project not found");
+      }
+
+      const archivedProject = await db
+        .update(project)
+        .set({ isArchived: true })
+        .where(eq(project.id, input.id))
+        .returning();
+
+      if (!archivedProject[0]) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to archive project",
+        });
+      }
+
+      return respond({ message: "Project archived", data: archivedProject[0] });
+    }),
+
+  // Unarchive a project
+  unarchive: protectedProcedure
+    .input(getProjectInput)
+    .output(makeResponseSchema(projectOutput))
+    .mutation(async ({ ctx, input }) => {
+      const existingProject = await db
+        .select()
+        .from(project)
+        .where(
+          and(
+            eq(project.id, input.id),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (existingProject.length === 0) {
+        throw new Error("Project not found");
+      }
+
+      const unarchivedProject = await db
+        .update(project)
+        .set({ isArchived: false })
+        .where(eq(project.id, input.id))
+        .returning();
+
+      if (!unarchivedProject[0]) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to unarchive project",
+        });
+      }
+
+      return respond({
+        message: "Project unarchived",
+        data: unarchivedProject[0],
+      });
+    }),
+
+  // Change project status
+  changeStatus: protectedProcedure
+    .input(changeProjectStatusInput)
+    .output(makeResponseSchema(projectOutput))
+    .mutation(async ({ ctx, input }) => {
+      const existingProject = await db
+        .select()
+        .from(project)
+        .where(
+          and(
+            eq(project.id, input.id),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (existingProject.length === 0) {
+        throw new Error("Project not found");
+      }
+
+      const updatedProject = await db
+        .update(project)
+        .set({ status: input.status })
+        .where(eq(project.id, input.id))
+        .returning();
+
+      if (!updatedProject[0]) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to change project status",
+        });
+      }
+
+      return respond({
+        message: "Project status updated",
+        data: updatedProject[0],
+      });
+    }),
+
+  // Toggle project public/private visibility
+  togglePublic: protectedProcedure
+    .input(toggleProjectPublicInput)
+    .output(makeResponseSchema(projectOutput))
+    .mutation(async ({ ctx, input }) => {
+      const existingProject = await db
+        .select()
+        .from(project)
+        .where(
+          and(
+            eq(project.id, input.id),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (existingProject.length === 0) {
+        throw new Error("Project not found");
+      }
+
+      const currentProject = existingProject[0];
+      if (!currentProject) {
+        throw new Error("Project not found");
+      }
+
+      const updatedProject = await db
+        .update(project)
+        .set({ isPublic: !currentProject.isPublic })
+        .where(eq(project.id, input.id))
+        .returning();
+
+      if (!updatedProject[0]) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to toggle project visibility",
+        });
+      }
+
+      return respond({
+        message: `Project is now ${updatedProject[0].isPublic ? "public" : "private"}`,
+        data: updatedProject[0],
+      });
     }),
 });

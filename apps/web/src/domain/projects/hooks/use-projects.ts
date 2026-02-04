@@ -77,6 +77,62 @@ export function useProjects() {
     }),
   );
 
+  const archiveMutation = useMutation(
+    trpc.projects.archive.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+        toast.success("Project archived successfully");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const unarchiveMutation = useMutation(
+    trpc.projects.unarchive.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+        toast.success("Project unarchived successfully");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const changeStatusMutation = useMutation(
+    trpc.projects.changeStatus.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+        toast.success("Project status updated successfully");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const togglePublicMutation = useMutation(
+    trpc.projects.togglePublic.mutationOptions({
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+        toast.success(data.message);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
   const status: "loading" | "error" | "empty" | "success" =
     projectsQuery.isLoading
       ? "loading"
@@ -96,5 +152,13 @@ export function useProjects() {
     isUpdating: updateMutation.isPending,
     deleteProject: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isPending,
+    archiveProject: archiveMutation.mutateAsync,
+    isArchiving: archiveMutation.isPending,
+    unarchiveProject: unarchiveMutation.mutateAsync,
+    isUnarchiving: unarchiveMutation.isPending,
+    changeProjectStatus: changeStatusMutation.mutateAsync,
+    isChangingStatus: changeStatusMutation.isPending,
+    toggleProjectPublic: togglePublicMutation.mutateAsync,
+    isTogglingPublic: togglePublicMutation.isPending,
   };
 }

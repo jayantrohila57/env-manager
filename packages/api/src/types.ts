@@ -94,6 +94,12 @@ export const projectOutput = z.object({
 export const environmentOutput = z.object({
   id: z.string(),
   name: z.string(),
+  slug: z.string(),
+  branch: z.string().nullable(),
+  deployedUrl: z.string().nullable(),
+  status: z.enum(["active", "inactive", "building", "failed"]),
+  isProduction: z.boolean(),
+  description: z.string().nullable(),
   projectId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
