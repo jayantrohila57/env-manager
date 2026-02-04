@@ -33,7 +33,7 @@ export default async function ProjectsPage() {
   });
 
   if (!session?.user) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

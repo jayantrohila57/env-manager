@@ -2,9 +2,7 @@
 
 import {
   ChevronRight,
-  ClockAlertIcon,
   FolderClosedIcon,
-  FrameIcon,
   LayoutDashboardIcon,
   type LucideIcon,
 } from "lucide-react";

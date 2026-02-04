@@ -40,7 +40,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   });
 
   if (!session?.user) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

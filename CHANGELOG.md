@@ -113,6 +113,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Project Management**: Refactored project components for better modularity
 - **Environment Variables**: Updated environment panel and project detail components
 
+## [1.7.1] - 2026-02-04
+
+### Fixed
+
+- **Build Issues**: Resolved TypeScript compilation errors for Next.js 16 compatibility
+- **Redirect Function**: Fixed redirect calls in dashboard pages with proper type handling
+- **SignOut Function**: Fixed authentication sign-out callback parameters
+- **Component Dependencies**: Removed unused components causing build failures
+- **Import Issues**: Cleaned up unused imports in navigation components
+
+### Changed
+
+- **Dependencies**: Added @base-ui/react for combobox component support
+- **Type Safety**: Improved Promise handling in environment creation flow
+
 ## [Unreleased]
 
 ### Added

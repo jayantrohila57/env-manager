@@ -18,13 +18,15 @@ export const SignOutDropdownMenuItem = React.forwardRef<
   const handleSignOut = () => {
     startTransition(async () => {
       const toastId = toast.loading("Signing out...");
-      try {
-        await signOut();
-        toast.success("Sign out successful", { id: toastId });
-      } catch (error) {
-        console.error("Sign out failed", error);
-        toast.error("Sign out failed", { id: toastId });
-      }
+      await signOut(
+        () => {
+          toast.success("Sign out successful", { id: toastId });
+        },
+        (error) => {
+          console.error("Sign out failed", error);
+          toast.error("Sign out failed", { id: toastId });
+        },
+      );
     });
   };
 

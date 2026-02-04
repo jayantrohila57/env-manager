@@ -45,7 +45,9 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
         environments={environments}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onCreate={(name) => createEnvironment({ projectId, name })}
+        onCreate={async (name) => {
+          await createEnvironment({ projectId, name });
+        }}
         isCreating={isCreating}
       >
         {(env) => <EnvironmentPanel environmentId={env.id} />}
