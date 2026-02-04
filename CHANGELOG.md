@@ -128,11 +128,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dependencies**: Added @base-ui/react for combobox component support
 - **Type Safety**: Improved Promise handling in environment creation flow
 
+## [1.7.3] - 2026-02-04
+
+### Fixed
+
+- Fixed sidebar active state logic to properly handle nested routes
+- Improved menu item rendering with centralized configuration array
+
 ## [Unreleased]
 
 ### Added
 
 ### Changed
+
+### Fixed
 
 ## [1.2.0] - 2026-01-19
 
