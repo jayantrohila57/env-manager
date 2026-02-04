@@ -24,7 +24,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
 
 interface NavItem {
   title: string;
@@ -95,29 +94,9 @@ export function NavMain() {
             return (
               <SidebarMenuItem key={item.title}>
                 <Link href={item.url as Route} className="block w-full">
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    className={cn(
-                      "w-full transition-colors",
-                      isItemActive && "bg-primary text-primary-foreground",
-                      !isItemActive && "hover:bg-accent/50",
-                    )}
-                  >
-                    {item.icon && (
-                      <item.icon
-                        className={cn(
-                          "h-4 w-4",
-                          isItemActive ? "opacity-100" : "opacity-70",
-                        )}
-                      />
-                    )}
-                    <span
-                      className={cn(
-                        isItemActive ? "font-medium" : "font-normal",
-                      )}
-                    >
-                      {item.title}
-                    </span>
+                  <SidebarMenuButton tooltip={item.title}>
+                    {item.icon && <item.icon className="h-4 w-4" />}
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
@@ -133,67 +112,22 @@ export function NavMain() {
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    className={cn(
-                      "transition-colors",
-                      isItemActive && "bg-accent text-accent-foreground",
-                      !isItemActive && "hover:bg-accent/50",
-                    )}
-                  >
-                    {item.icon && (
-                      <item.icon
-                        className={cn(
-                          "h-4 w-4",
-                          isItemActive ? "opacity-100" : "opacity-70",
-                        )}
-                      />
-                    )}
-                    <span
-                      className={cn(
-                        isItemActive ? "font-medium" : "font-normal",
-                      )}
-                    >
-                      {item.title}
-                    </span>
+                  <SidebarMenuButton tooltip={item.title}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
                     <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => {
-                      const isSubItemActive = isActive(subItem.url);
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link
-                              href={subItem.url as Route}
-                              className={cn(
-                                "block w-full",
-                                isSubItemActive
-                                  ? "bg-primary text-primary-foreground"
-                                  : "text-muted-foreground hover:text-foreground",
-                              )}
-                            >
-                              {subItem.icon && (
-                                <subItem.icon
-                                  className={cn(
-                                    "h-4 w-4",
-                                    isItemActive ? "opacity-100" : "opacity-70",
-                                  )}
-                                />
-                              )}
+                            <Link href={subItem.url as Route}>
+                              {subItem.icon && <subItem.icon />}
 
-                              <span
-                                className={cn(
-                                  "transition-colors",
-                                  isSubItemActive
-                                    ? "font-medium"
-                                    : "font-normal",
-                                )}
-                              >
-                                {subItem.title}
-                              </span>
+                              <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
