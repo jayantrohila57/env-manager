@@ -135,7 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed sidebar active state logic to properly handle nested routes
 - Improved menu item rendering with centralized configuration array
 
-## [Unreleased]
+## [1.7.4] - 2026-02-04
 
 ### Added
 
@@ -159,6 +159,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Applied database migrations successfully with proper indexes and constraints
 - Fixed environment creation missing required slug field
 - Removed broken template references and components
+
+## [Unreleased]
 
 ## [1.2.0] - 2026-01-19
 
