@@ -82,18 +82,6 @@ export function NavMain() {
       icon: FolderClosedIcon,
       isActive: true,
     },
-    {
-      title: "Template",
-      url: "/dashboard/templates",
-      icon: FrameIcon,
-      isActive: true,
-    },
-    {
-      title: "Audit",
-      url: "/dashboard/audit",
-      icon: ClockAlertIcon,
-      isActive: true,
-    },
   ];
   return (
     <SidebarGroup>

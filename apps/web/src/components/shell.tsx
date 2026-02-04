@@ -3,7 +3,7 @@ import React, { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export const Shell = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
+  return children;
 };
 
 const HeaderVariants = cva("bg-background/20 backdrop-blur-xs", {
@@ -13,10 +13,10 @@ const HeaderVariants = cva("bg-background/20 backdrop-blur-xs", {
       sticky: "sticky top-0 z-50",
     },
     scale: {
-      default: "h-16 w-full",
+      default: "w-full",
     },
     padding: {
-      default: "px-2 sm:px-5 md:px-10 lg:px-16",
+      default: "",
       none: "",
     },
   },
@@ -66,7 +66,7 @@ Shell.Aside = Aside;
 const FooterVariants = cva("backdrop-blur-xs", {
   variants: {
     variant: {
-      default: "",
+      default: "container mx-auto",
       absolute: "absolute bottom-0 z-50",
       sticky: "sticky bottom-0 z-50",
     },
@@ -74,7 +74,7 @@ const FooterVariants = cva("backdrop-blur-xs", {
       default: "h-full w-full",
     },
     padding: {
-      default: "px-2 sm:px-5 md:px-10 lg:px-16",
+      default: "px-5 sm:px-5 md:px-10 lg:px-16",
       none: "",
     },
   },
@@ -119,10 +119,10 @@ const MainVariants = cva("relative", {
     scale: {
       full: "h-full w-full",
       default: "h-full min-h-screen w-full",
-      dashboard: "h-screen w-full",
+      dashboard: "h-[calc(100vh-18rem)] w-full overflow-hidden",
     },
     padding: {
-      default: "px-2 sm:px-5 md:px-10 lg:px-16",
+      default: "",
       none: "",
     },
   },
@@ -170,7 +170,8 @@ const SectionVariants = cva("relative", {
       full: "h-full w-full",
     },
     padding: {
-      default: "",
+      default: "px-5 sm:px-5 md:px-10 lg:px-16",
+      dashboard: "",
       center: "flex flex-col items-center justify-center p-10 sm:p-16 md:p-20",
     },
   },

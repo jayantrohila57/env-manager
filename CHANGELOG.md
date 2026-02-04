@@ -92,6 +92,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Legacy Page Components**: Removed old page.tsx and replaced with modern server component architecture
 - **Deprecated Auth Components**: Replaced sign-in-form, sign-in-view, and use-auth hook with new domain-driven architecture
 
+## [1.7.0] - 2026-02-04
+
+### Added
+
+- **New Footer Component**: Created modern footer with brand section and copyright information
+- **Enhanced Project Creation**: Added dedicated project creation page with improved UX
+- **Public Layout**: Added public layout for better page organization
+- **New UI Components**: Added carousel, combobox, direction, native-select, and resizable components
+- **Cookie Management**: Added cookie utilities for better state management
+
+### Changed
+
+- **Navigation Cleanup**: Removed template and audit navigation links from sidebar
+- **User Menu Refactor**: Simplified user menu component and removed settings option
+- **Avatar Styling**: Updated avatar components with consistent styling across the app
+- **Dashboard Layout**: Improved dashboard section padding and layout consistency
+- **Breadcrumbs**: Enhanced breadcrumbs with responsive design (hidden on mobile, shown in dedicated section on desktop)
+- **Component Cleanup**: Removed deprecated components including input-group, input-otp, slider, and user-menu
+- **Project Management**: Refactored project components for better modularity
+- **Environment Variables**: Updated environment panel and project detail components
+
 ## [Unreleased]
 
 ### Added

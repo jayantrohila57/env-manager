@@ -14,11 +14,11 @@ import { NavMain } from "./nav-main";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" variant="inset" className="bg-black" {...props}>
-      <SidebarHeader className="mb-2 rounded-sm border bg-card/30">
+    <Sidebar collapsible="icon" variant="inset" {...props}>
+      <SidebarHeader>
         <NavHeader />
       </SidebarHeader>
-      <SidebarContent className="rounded-sm border bg-card/30">
+      <SidebarContent>
         <Suspense fallback={<div>Loading navigation...</div>}>
           <NavMain />
         </Suspense>

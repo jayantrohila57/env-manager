@@ -34,6 +34,19 @@ export async function signInWithGithub(
 /**
  * Sign out current user
  */
-export async function signOut() {
-  await authClient.signOut();
+export async function signOut(
+  onSuccess: () => void,
+  onError: (error: Error) => void,
+) {
+  try {
+    await authClient.signOut(
+      {},
+      {
+        onSuccess,
+        onError: () => {}, // Error handled in catch
+      },
+    );
+  } catch (error) {
+    onError(error as unknown as Error);
+  }
 }

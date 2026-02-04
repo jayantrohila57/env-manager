@@ -23,8 +23,8 @@ export const metadata: Metadata = {
 const header = {
   title: "Projects",
   description: "Manage your projects and environment variables",
-  action: "View Audit Logs",
-  actionUrl: "/audit",
+  action: "New Project",
+  actionUrl: "/dashboard/projects/new",
 };
 
 export default async function ProjectsPage() {
@@ -38,7 +38,7 @@ export default async function ProjectsPage() {
 
   return (
     <Shell>
-      <Shell.Section variant="dashboard">
+      <Shell.Section variant="dashboard" padding="dashboard" scale="full">
         <DashboardSection {...header}>
           <ProjectList />
         </DashboardSection>

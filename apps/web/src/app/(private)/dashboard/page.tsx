@@ -9,7 +9,7 @@ const header = {
 export default function DashboardPage() {
   return (
     <Shell>
-      <Shell.Section variant="dashboard">
+      <Shell.Section variant="dashboard" padding="dashboard" scale="full">
         <DashboardSection {...header}>
           <div>Dashboard</div>
         </DashboardSection>

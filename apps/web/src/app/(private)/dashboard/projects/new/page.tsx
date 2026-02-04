@@ -5,27 +5,29 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import DashboardSection from "@/components/section-dashboard";
 import Shell from "@/components/shell";
-import { TemplatesSkeleton } from "@/domain/templates/components/skeletons";
-import { siteConfig } from "@/lib/siteConfig";
+import { ProjectsSkeleton } from "@/domain/projects/components/skeletons";
 
-const TemplateList = dynamic(
-  () => import("@/domain/templates/components/template-list"),
+const CreateProject = dynamic(
+  async () =>
+    import("@/domain/projects/components/project-create").then(
+      (mod) => mod.CreateProject,
+    ),
   {
-    loading: () => <TemplatesSkeleton />,
+    loading: () => <ProjectsSkeleton />,
   },
 );
 
 export const metadata: Metadata = {
-  title: "Templates",
-  description: `Manage reusable environment templates in ${siteConfig.name}.`,
+  title: "Create New Project",
+  description: "Add a new project to organize your environment variables.",
 };
 
 const header = {
-  title: "Templates",
-  description: "Manage reusable environment templates",
+  title: "Create New Project",
+  description: " Add a new project to organize your environment variables.",
 };
 
-export default async function TemplatesPage() {
+export default async function ProjectsPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -36,9 +38,9 @@ export default async function TemplatesPage() {
 
   return (
     <Shell>
-      <Shell.Section variant="dashboard">
+      <Shell.Section variant="dashboard" padding="dashboard" scale="full">
         <DashboardSection {...header}>
-          <TemplateList />
+          <CreateProject />
         </DashboardSection>
       </Shell.Section>
     </Shell>

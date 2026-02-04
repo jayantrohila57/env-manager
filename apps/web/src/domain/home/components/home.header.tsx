@@ -1,24 +1,14 @@
-"use client";
-
+import Link from "next/link";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-
+import { UserMenu } from "@/domain/auth/components/user-menu";
 import { siteConfig } from "@/lib/siteConfig";
 
-export function NavHeader() {
+export default function Header() {
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          size="lg"
-          variant={"default"}
-          className="p-0 hover:bg-transparent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-        >
+    <div className="container mx-auto flex h-16 w-full flex-row items-center justify-between px-5 sm:px-5 md:px-10 lg:px-16">
+      <div className="w-full flex-1">
+        <Link href="/" className="flex items-center space-x-2">
           <Avatar className="border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50">
             <AvatarImage src="/favicon/favicon.ico" alt={siteConfig.name} />
             <AvatarFallback className="border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50">
@@ -27,12 +17,13 @@ export function NavHeader() {
                 : "NA"}
             </AvatarFallback>
           </Avatar>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{siteConfig.name}</span>
-            <span className="truncate text-xs">{siteConfig.description}</span>
-          </div>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
+          <span className="font-semibold text-xl">{siteConfig.name}</span>
+        </Link>
+      </div>
+      <div className="flex items-center space-x-2">
+        <ModeToggle />
+        <UserMenu />
+      </div>
+    </div>
   );
 }

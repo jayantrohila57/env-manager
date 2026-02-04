@@ -1,49 +1,58 @@
 "use client";
 
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { useProjects } from "../hooks/use-projects";
-import { CreateProjectDialog } from "./create-project-dialog";
-import { ProjectListView } from "./project-list-view";
-
-interface Project {
-  id: string;
-  name: string;
-  description: string | null;
-}
+import { ProjectCardView } from "./project-card-view";
+import { ProjectsSkeleton } from "./skeletons";
 
 export default function ProjectList() {
-  const { projects, status, createProject, isCreating, deleteProject } =
-    useProjects();
+  const { projects, status } = useProjects();
 
-  const handleCreate = async (data: { name: string; description?: string }) => {
-    await createProject(data);
-  };
-
-  const handleEdit = async (project: Project) => {
-    // In a real app, this would open a dialog.
-    // For brevity, I'll keep logic simple in the container.
-    console.log("Edit project", project);
-  };
-
-  const handleDelete = async (project: Project) => {
-    if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
-      await deleteProject({ id: project.id });
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-xl">Projects</h2>
-        <CreateProjectDialog onConfirm={handleCreate} isPending={isCreating} />
-      </div>
-
-      <ProjectListView
-        projects={projects}
-        status={status}
-        onCreate={() => {}} // Create is handled by its own dialog trigger in the header
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-    </div>
-  );
+  switch (status) {
+    case "loading":
+      return <ProjectsSkeleton />;
+    case "error":
+      return (
+        <div className="rounded-lg border border-destructive/50 p-8 text-center text-destructive">
+          <p>Failed to load projects. Please try again.</p>
+        </div>
+      );
+    case "empty":
+      return (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Plus className="h-6 w-6" />
+            </EmptyMedia>
+            <EmptyTitle>No projects yet</EmptyTitle>
+            <EmptyDescription>
+              Create your first project to start managing environment variables.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Project
+            </Button>
+          </EmptyContent>
+        </Empty>
+      );
+    case "success":
+      return (
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {projects.map((project) => (
+            <ProjectCardView key={project.id} project={project} />
+          ))}
+        </div>
+      );
+  }
 }
