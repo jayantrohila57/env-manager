@@ -1,7 +1,7 @@
 "use client";
 
 import type { ProjectOutput } from "@env-manager/api/types";
-import { Calendar, Folder, GitBranch, Github, Globe } from "lucide-react";
+import { Calendar, Folder, Github, Globe } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +38,7 @@ export function ProjectCardView({ project }: ProjectCardViewProps) {
       </CardHeader>
       <CardHeader>
         <Link
-          href={`/dashboard/projects/${project.id}` as Route}
+          href={`/dashboard/projects/${project.slug}` as Route}
           className="group block h-full"
         >
           <CardTitle>{project.name}</CardTitle>

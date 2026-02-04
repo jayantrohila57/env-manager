@@ -5,19 +5,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { trpc } from "@/utils/trpc";
 
-export function useEnvironments(projectId: string) {
+export function useEnvironments(projectSlug: string) {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<string | undefined>();
 
   const projectQuery = useQuery(
-    trpc.projects.get.queryOptions({ id: projectId }),
+    trpc.projects.getBySlug.queryOptions({ slug: projectSlug }),
   );
 
   const createEnvMutation = useMutation(
     trpc.environments.create.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.projects.get.queryKey({ id: projectId }),
+          queryKey: trpc.projects.getBySlug.queryKey({ slug: projectSlug }),
         });
         toast.success("Environment created successfully");
       },
@@ -47,5 +47,6 @@ export function useEnvironments(projectId: string) {
     setActiveTab,
     createEnvironment: createEnvMutation.mutateAsync,
     isCreating: createEnvMutation.isPending,
+    projectId: projectData.project?.id,
   };
 }

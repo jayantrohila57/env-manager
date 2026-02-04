@@ -44,6 +44,10 @@ export const getProjectInput = z.object({
   id: z.string().uuid(),
 });
 
+export const getProjectBySlugInput = z.object({
+  slug: z.string().min(1),
+});
+
 export const projectOutput = z.object({
   id: z.string(),
   name: z.string(),

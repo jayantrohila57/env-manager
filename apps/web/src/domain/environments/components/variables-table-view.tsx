@@ -1,6 +1,14 @@
 "use client";
 
-import { Copy, Eye, EyeOff, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import {
+  Copy,
+  Eye,
+  EyeOff,
+  MoreVertical,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +18,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   Table,
   TableBody,
   TableCell,
@@ -17,6 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AddVariableDialog } from "./add-variable-dialog";
 
 interface Variable {
   id: string;
@@ -30,6 +47,8 @@ interface VariablesTableViewProps {
   onCopy: (id: string) => void;
   onEdit: (variable: Variable) => void;
   onDelete: (id: string) => void;
+  onAddVariable: (data: { key: string; value: string }) => Promise<void>;
+  isAddingVariable: boolean;
 }
 
 export function VariablesTableView({
@@ -39,7 +58,31 @@ export function VariablesTableView({
   onCopy,
   onEdit,
   onDelete,
+  onAddVariable,
+  isAddingVariable,
 }: VariablesTableViewProps) {
+  if (variables.length === 0) {
+    return (
+      <Empty className="h-full w-full border-2 border-muted-foreground/20 border-dashed bg-muted/30">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <Plus className="h-6 w-6" />
+          </EmptyMedia>
+          <EmptyTitle>No variables yet</EmptyTitle>
+          <EmptyDescription>
+            Add your first environment variable to get started.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <AddVariableDialog
+            onConfirm={onAddVariable}
+            isPending={isAddingVariable}
+          />
+        </EmptyContent>
+      </Empty>
+    );
+  }
+
   return (
     <div className="rounded-lg border">
       <Table>

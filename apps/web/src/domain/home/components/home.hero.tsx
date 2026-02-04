@@ -12,7 +12,7 @@ export default function Hero() {
   const { data: session, isPending } = useSession();
 
   return (
-    <div className="flex flex-col items-start justify-start space-y-4 py-8 md:items-start md:text-left">
+    <div className="flex flex-col items-start justify-start space-y-4 py-16 md:items-start md:text-left">
       <div className="space-y-8">
         <Badge variant="secondary" className="mb-4">
           <Zap className="mr-2 h-3 w-3" />
@@ -32,7 +32,7 @@ export default function Hero() {
         {isPending ? (
           <div className="h-11 w-32 animate-pulse rounded-lg bg-muted" />
         ) : session?.user ? (
-          <Button size="lg" className="gap-2" asChild>
+          <Button size="lg" className="w-80 gap-2" asChild>
             <Link href="/dashboard">
               Get Started
               <ArrowRight className="h-4 w-4" />
@@ -44,9 +44,9 @@ export default function Hero() {
       </div>
 
       <div className="grid w-full grid-cols-1 gap-6 pt-4 sm:grid-cols-3">
-        <Card className="bg-transparent">
-          <CardContent className="p-4 text-center">
-            <div className="mb-2 flex justify-center">
+        <Card className="border bg-input/30">
+          <CardContent className="p-4 text-left">
+            <div className="mb-2 flex justify-start">
               <Shield className="h-8 w-8 text-primary" />
             </div>
             <h3 className="font-semibold">Secure Storage</h3>
@@ -55,9 +55,9 @@ export default function Hero() {
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-transparent">
-          <CardContent className="p-4 text-center">
-            <div className="mb-2 flex justify-center">
+        <Card className="border bg-input/30">
+          <CardContent className="p-4 text-left">
+            <div className="mb-2 flex justify-start">
               <Zap className="h-8 w-8 text-primary" />
             </div>
             <h3 className="font-semibold">CI/CD Integration</h3>
@@ -66,9 +66,9 @@ export default function Hero() {
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-transparent">
-          <CardContent className="p-4 text-center">
-            <div className="mb-2 flex justify-center">
+        <Card className="border bg-input/30">
+          <CardContent className="p-4 text-left">
+            <div className="mb-2 flex justify-start">
               <CheckCircle className="h-8 w-8 text-primary" />
             </div>
             <h3 className="font-semibold">Multi-Environment</h3>

@@ -26,7 +26,6 @@ export function EnvironmentPanel({ environmentId }: { environmentId: string }) {
   };
 
   const handleCopy = (id: string) => {
-    // Logic to fetch and copy value
     console.log("Copy variable", id);
   };
 
@@ -58,6 +57,8 @@ export function EnvironmentPanel({ environmentId }: { environmentId: string }) {
         onCopy={handleCopy}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onAddVariable={handleCreate}
+        isAddingVariable={isCreating}
       />
     </div>
   );

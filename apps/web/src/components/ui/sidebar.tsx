@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/suspicious/noDocumentCookie: <explanation> */
+/** biome-ignore-all lint/suspicious/noDocumentCookie: Using cookies for sidebar state management */
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";

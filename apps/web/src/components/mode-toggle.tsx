@@ -2,6 +2,7 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +13,21 @@ import {
 
 export function ModeToggle() {
   const { setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Only render after component is mounted to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button variant="outline" size="icon">
+        <Sun className="h-[1.2rem] w-[1.2rem]" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>

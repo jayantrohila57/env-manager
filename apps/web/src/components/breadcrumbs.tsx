@@ -1,5 +1,6 @@
 "use client";
 
+import { Home } from "lucide-react";
 import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
@@ -11,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { cn } from "@/lib/utils";
+import { cn, deSlug } from "@/lib/utils";
 
 const generateBreadcrumbs = (pathname: string) => {
   const pathArray = pathname?.split("/")?.filter(Boolean);
@@ -34,6 +35,11 @@ export function Breadcrumbs({ className }: { className?: string }) {
   return (
     <Breadcrumb>
       <BreadcrumbList className={cn("", className)}>
+        <BreadcrumbItem>
+          <BreadcrumbLink className="capitalize" href={"/"}>
+            <Home className="size-4" />
+          </BreadcrumbLink>
+        </BreadcrumbItem>
         {breadcrumbs?.map((breadcrumb, index) => (
           <React.Fragment key={breadcrumb?.href}>
             <BreadcrumbSeparator className="first:hidden">
@@ -42,7 +48,7 @@ export function Breadcrumbs({ className }: { className?: string }) {
             <BreadcrumbItem>
               {index === breadcrumbs?.length - 1 ? (
                 <BreadcrumbPage className="capitalize">
-                  {breadcrumb?.label}
+                  {deSlug(breadcrumb?.label)}
                 </BreadcrumbPage>
               ) : (
                 <BreadcrumbLink
@@ -50,7 +56,7 @@ export function Breadcrumbs({ className }: { className?: string }) {
                   href={breadcrumb?.href}
                   onClick={() => handleBreadcrumbClick(breadcrumb?.href)}
                 >
-                  {breadcrumb?.label}
+                  {deSlug(breadcrumb?.label)}
                 </BreadcrumbLink>
               )}
             </BreadcrumbItem>

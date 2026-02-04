@@ -95,7 +95,7 @@ export default function Features() {
           {features.map((feature) => (
             <Card
               key={`feature-${feature.title.toLowerCase()}`}
-              className="relative overflow-hidden bg-transparent"
+              className="relative overflow-hidden border bg-input/30"
             >
               <CardHeader className="pb-4">
                 <div className="mb-2 flex items-center justify-between">

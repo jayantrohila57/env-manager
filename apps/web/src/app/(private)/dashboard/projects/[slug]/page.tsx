@@ -7,9 +7,10 @@ import { redirect } from "next/navigation";
 import DashboardSection from "@/components/section-dashboard";
 import Shell from "@/components/shell";
 import { ProjectDetailSkeleton } from "@/domain/environments/components/skeletons";
+import { deSlug } from "@/lib/utils";
 
 const ProjectDetail = dynamic(
-  () => import("@/domain/environments/components/project-detail"),
+  () => import("@/domain/projects/components/project-detail"),
   {
     loading: () => <ProjectDetailSkeleton />,
   },
@@ -17,23 +18,25 @@ const ProjectDetail = dynamic(
 
 interface ProjectPageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
+  const projectTitle = deSlug(slug);
 
   return {
-    title: `Project Details – ${id}`,
-    description: `Manage project environments and variables for project ${id}.`,
+    title: projectTitle,
+    description: `Manage project environments and variables for project ${projectTitle}.`,
   };
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const { id } = await params;
+  const { slug } = await params;
+  const projectTitle = deSlug(slug);
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -47,10 +50,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     <Shell>
       <Shell.Section variant="dashboard" padding="dashboard" scale="full">
         <DashboardSection
-          title={`Project Details – ${id}`}
-          description={`Manage project environments and variables for project ${id}.`}
+          title="Project Details"
+          description={`Manage project environments and variables for project ${projectTitle}.`}
         >
-          <ProjectDetail projectId={id} />
+          <ProjectDetail projectSlug={slug} />
         </DashboardSection>
       </Shell.Section>
     </Shell>

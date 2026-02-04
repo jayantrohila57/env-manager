@@ -34,7 +34,7 @@ export function GitHubLoginButton() {
       onClick={handleSignIn}
       disabled={isLoading}
       size="lg"
-      className="gap-2 bg-primary hover:bg-primary/90"
+      className="w-80 gap-2 bg-primary hover:bg-primary/90"
     >
       {isLoading ? (
         <Loader className="h-4 w-4 animate-spin" />

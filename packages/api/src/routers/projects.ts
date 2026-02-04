@@ -7,6 +7,7 @@ import { protectedProcedure, router } from "../index";
 import {
   createProjectInput,
   environmentOutput,
+  getProjectBySlugInput,
   getProjectInput,
   makeResponseSchema,
   projectOutput,
@@ -28,7 +29,7 @@ export const projectsRouter = router({
       return respond({ message: "Projects fetched", data: projectsList });
     }),
 
-  // Get a single project with its environments
+  // Get a single project with its environments by ID
   get: protectedProcedure
     .input(getProjectInput)
     .output(
@@ -89,6 +90,79 @@ export const projectsRouter = router({
         data: {
           project: projectRecord ?? null,
           environments: projectRecord ? environmentsList : [],
+        },
+      });
+    }),
+
+  // Get a single project with its environments by slug
+  getBySlug: protectedProcedure
+    .input(getProjectBySlugInput)
+    .output(
+      makeResponseSchema(
+        z.object({
+          project: projectOutput.nullable(),
+          environments: z.array(environmentOutput),
+        }),
+      ),
+    )
+    .query(async ({ ctx, input }) => {
+      const projectData = await db
+        .select({
+          id: project.id,
+          name: project.name,
+          slug: project.slug,
+          description: project.description,
+          isArchived: project.isArchived,
+          isPublic: project.isPublic,
+          repositoryUrl: project.repositoryUrl,
+          websiteUrl: project.websiteUrl,
+          status: project.status,
+          userId: project.userId,
+          createdAt: project.createdAt,
+          updatedAt: project.updatedAt,
+        })
+        .from(project)
+        .where(
+          and(
+            eq(project.slug, input.slug),
+            eq(project.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (projectData.length === 0) {
+        return respond({
+          message: "Project not found",
+          data: {
+            project: null,
+            environments: [],
+          },
+        });
+      }
+
+      const environmentsList = await db
+        .select({
+          id: environment.id,
+          name: environment.name,
+          slug: environment.slug,
+          branch: environment.branch,
+          deployedUrl: environment.deployedUrl,
+          status: environment.status,
+          isProduction: environment.isProduction,
+          description: environment.description,
+          projectId: environment.projectId,
+          createdAt: environment.createdAt,
+          updatedAt: environment.updatedAt,
+        })
+        .from(environment)
+        .where(eq(environment.projectId, projectData[0].id))
+        .orderBy(environment.name);
+
+      return respond({
+        message: "Project fetched",
+        data: {
+          project: projectData[0],
+          environments: environmentsList,
         },
       });
     }),
