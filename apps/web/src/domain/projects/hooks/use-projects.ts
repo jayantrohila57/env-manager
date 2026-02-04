@@ -33,14 +33,6 @@ function transformProject(project: ApiProject): ProjectOutput {
   return {
     ...project,
     status: project.status as "active" | "inactive" | "maintenance",
-    createdAt:
-      typeof project.createdAt === "string"
-        ? new Date(project.createdAt)
-        : project.createdAt,
-    updatedAt:
-      typeof project.updatedAt === "string"
-        ? new Date(project.updatedAt)
-        : project.updatedAt,
   };
 }
 
@@ -54,12 +46,11 @@ export function useProjects() {
         // Optimistically update the cache with the new project
         queryClient.setQueryData(
           trpc.projects.list.queryKey(),
-          (old: unknown) => {
-            if (!old || typeof old !== "object" || !("data" in old)) return old;
-            const oldData = old as { data: unknown[] };
+          (old: ProjectsQueryResponse | undefined) => {
+            if (!old) return old;
             return {
-              ...oldData,
-              data: [...oldData.data, transformProject(data.data)],
+              ...old,
+              data: [...old.data, transformProject(data.data)],
             };
           },
         );
@@ -92,25 +83,20 @@ export function useProjects() {
         // Snapshot the previous value
         const previousProjects = queryClient.getQueryData(
           trpc.projects.list.queryKey(),
-        ) as unknown;
+        ) as ProjectsQueryResponse | undefined;
 
         // Optimistically update to the new value
         queryClient.setQueryData(
           trpc.projects.list.queryKey(),
-          (old: unknown) => {
-            if (!old || typeof old !== "object" || !("data" in old)) return old;
-            const oldData = old as { data: unknown[] };
+          (old: ProjectsQueryResponse | undefined) => {
+            if (!old) return old;
             return {
-              ...oldData,
-              data: oldData.data.map((project: unknown) => {
-                if (typeof project === "object" && project && "id" in project) {
-                  const proj = project as { id: string };
-                  return proj.id === variables.id
-                    ? { ...proj, ...variables }
-                    : proj;
-                }
-                return project;
-              }),
+              ...old,
+              data: old.data.map((project) =>
+                project.id === variables.id
+                  ? { ...project, ...variables }
+                  : project,
+              ),
             };
           },
         );
@@ -150,23 +136,16 @@ export function useProjects() {
         // Snapshot the previous value
         const previousProjects = queryClient.getQueryData(
           trpc.projects.list.queryKey(),
-        ) as unknown;
+        ) as ProjectsQueryResponse | undefined;
 
         // Optimistically remove the deleted project
         queryClient.setQueryData(
           trpc.projects.list.queryKey(),
-          (old: unknown) => {
-            if (!old || typeof old !== "object" || !("data" in old)) return old;
-            const oldData = old as { data: unknown[] };
+          (old: ProjectsQueryResponse | undefined) => {
+            if (!old) return old;
             return {
-              ...oldData,
-              data: oldData.data.filter((project: unknown) => {
-                if (typeof project === "object" && project && "id" in project) {
-                  const proj = project as { id: string };
-                  return proj.id !== variables.id;
-                }
-                return true;
-              }),
+              ...old,
+              data: old.data.filter((project) => project.id !== variables.id),
             };
           },
         );

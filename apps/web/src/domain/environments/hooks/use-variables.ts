@@ -1,15 +1,22 @@
 "use client";
 
-import type { variableOutput } from "@env-manager/api/validation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { trpc } from "@/utils/trpc";
 
+type VariableOutput = {
+  id: string;
+  key: string;
+  environmentId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 interface VariablesQueryResponse {
   status: "success";
   message: string;
-  data: variableOutput[];
+  data: VariableOutput[];
   error: string | null;
 }
 
@@ -36,12 +43,12 @@ export function useVariables(environmentId: string) {
 
         // Optimistically add the new variable
         if (previousVariables?.data) {
-          const newVariable: variableOutput = {
+          const newVariable: VariableOutput = {
             id: `temp-${Date.now()}`,
             key: variables.key,
             environmentId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           };
 
           queryClient.setQueryData(
@@ -94,9 +101,13 @@ export function useVariables(environmentId: string) {
             trpc.environmentVariables.list.queryKey({ environmentId }),
             {
               ...previousVariables,
-              data: previousVariables.data.map((variable: variableOutput) =>
+              data: previousVariables.data.map((variable: VariableOutput) =>
                 variable.id === variables.id
-                  ? { ...variable, ...variables, updatedAt: new Date() }
+                  ? {
+                      ...variable,
+                      ...variables,
+                      updatedAt: new Date().toISOString(),
+                    }
                   : variable,
               ),
             },
@@ -143,7 +154,7 @@ export function useVariables(environmentId: string) {
             {
               ...previousVariables,
               data: previousVariables.data.filter(
-                (variable: variableOutput) => variable.id !== variables.id,
+                (variable: VariableOutput) => variable.id !== variables.id,
               ),
             },
           );
@@ -184,13 +195,13 @@ export function useVariables(environmentId: string) {
 
         // Optimistically add the new variables
         if (previousVariables?.data) {
-          const newVariables: variableOutput[] = variables.variables.map(
+          const newVariables: VariableOutput[] = variables.variables.map(
             (variable, index) => ({
               id: `temp-bulk-${Date.now()}-${index}`,
               key: variable.key,
               environmentId,
-              createdAt: new Date(),
-              updatedAt: new Date(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
             }),
           );
 
