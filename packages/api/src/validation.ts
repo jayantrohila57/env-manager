@@ -67,11 +67,25 @@ export const listEnvironmentsInput = z.object({
 export const createEnvironmentInput = z.object({
   projectId: z.string().uuid(),
   name: z.string().min(1).max(64),
+  slug: z.string().min(1).max(255).optional(),
+  branch: z.string().optional(),
+  deployedUrl: z.string().url().optional().or(z.literal("")),
+  status: z
+    .enum(["active", "inactive", "building", "failed"])
+    .default("active"),
+  isProduction: z.boolean().default(false),
+  description: z.string().optional(),
 });
 
 export const updateEnvironmentInput = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(64).optional(),
+  slug: z.string().min(1).max(255).optional(),
+  branch: z.string().optional(),
+  deployedUrl: z.string().url().optional().or(z.literal("")),
+  status: z.enum(["active", "inactive", "building", "failed"]).optional(),
+  isProduction: z.boolean().optional(),
+  description: z.string().optional(),
 });
 
 export const getEnvironmentInput = z.object({
@@ -81,6 +95,12 @@ export const getEnvironmentInput = z.object({
 export const environmentOutput = z.object({
   id: z.string(),
   name: z.string(),
+  slug: z.string(),
+  branch: z.string().nullable(),
+  deployedUrl: z.string().nullable(),
+  status: z.string(),
+  isProduction: z.boolean(),
+  description: z.string().nullable(),
   projectId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -154,8 +174,12 @@ export const auditLogOutput = z.object({
   variableId: z.string().nullable(),
   action: z.string(),
   entityType: z.string(),
+  entitySlug: z.string().nullable(),
   oldValue: z.string().nullable(),
   newValue: z.string().nullable(),
+  ipAddress: z.string().nullable(),
+  userAgent: z.string().nullable(),
+  metadata: z.string().nullable(),
   createdAt: z.date(),
 });
 

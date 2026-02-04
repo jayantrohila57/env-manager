@@ -6,6 +6,7 @@ import { z } from "zod/v3";
 import { protectedProcedure, router } from "../index";
 import {
   createProjectInput,
+  environmentOutput,
   getProjectInput,
   makeResponseSchema,
   projectOutput,
@@ -34,15 +35,7 @@ export const projectsRouter = router({
       makeResponseSchema(
         z.object({
           project: projectOutput.nullable(),
-          environments: z.array(
-            z.object({
-              id: z.string(),
-              name: z.string(),
-              projectId: z.string(),
-              createdAt: z.date(),
-              updatedAt: z.date(),
-            }),
-          ),
+          environments: z.array(environmentOutput),
         }),
       ),
     )
@@ -75,6 +68,12 @@ export const projectsRouter = router({
         .select({
           id: environment.id,
           name: environment.name,
+          slug: environment.slug,
+          branch: environment.branch,
+          deployedUrl: environment.deployedUrl,
+          status: environment.status,
+          isProduction: environment.isProduction,
+          description: environment.description,
           projectId: environment.projectId,
           createdAt: environment.createdAt,
           updatedAt: environment.updatedAt,
@@ -147,7 +146,13 @@ export const projectsRouter = router({
       }
 
       const updateData: Record<string, unknown> = {};
-      if (input.name !== undefined) updateData.name = input.name;
+      if (input.name !== undefined) {
+        updateData.name = input.name;
+        updateData.slug = input.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
       if (input.description !== undefined)
         updateData.description = input.description;
       if (input.repositoryUrl !== undefined)

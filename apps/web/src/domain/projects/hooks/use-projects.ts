@@ -1,8 +1,35 @@
 "use client";
 
+import type { ProjectOutput } from "@env-manager/api/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { trpc } from "@/utils/trpc";
+
+// Interface for API response before transformation
+interface ApiProject {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  status: string;
+  isArchived: boolean;
+  isPublic: boolean;
+  repositoryUrl: string | null;
+  websiteUrl: string | null;
+  userId: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+// Helper function to transform API response to proper ProjectOutput type
+function transformProject(project: ApiProject): ProjectOutput {
+  return {
+    ...project,
+    status: project.status as "active" | "inactive" | "maintenance",
+    createdAt: new Date(project.createdAt),
+    updatedAt: new Date(project.updatedAt),
+  };
+}
 
 export function useProjects() {
   const queryClient = useQueryClient();
@@ -60,7 +87,7 @@ export function useProjects() {
           : "success";
 
   return {
-    projects: projectsQuery.data?.data ?? [],
+    projects: (projectsQuery.data?.data ?? []).map(transformProject),
     status,
     error: projectsQuery.error,
     createProject: createMutation.mutateAsync,

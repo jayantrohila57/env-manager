@@ -13,8 +13,12 @@ export interface AuditLogData {
   variableId?: string | null;
   action: "CREATE" | "UPDATE" | "DELETE" | "BULK_IMPORT" | "EXPORT";
   entityType: "VARIABLE" | "ENVIRONMENT" | "PROJECT";
+  entitySlug?: string | null;
   oldValue?: string | null;
   newValue?: string | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  metadata?: string | null;
 }
 
 export async function createAuditLog(data: AuditLogData) {
@@ -27,8 +31,12 @@ export async function createAuditLog(data: AuditLogData) {
       variableId: data.variableId || null,
       action: data.action,
       entityType: data.entityType,
+      entitySlug: data.entitySlug || null,
       oldValue: data.oldValue || null,
       newValue: data.newValue || null,
+      ipAddress: data.ipAddress || null,
+      userAgent: data.userAgent || null,
+      metadata: data.metadata || null,
     });
   } catch (error) {
     console.error("Failed to create audit log:", error);

@@ -24,7 +24,7 @@ export default function OrganizationLayout({
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <div className="flex h-16 shrink-0 items-center gap-2 px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 group-has-data-[collapsible=icon]/sidebar-wrapper:px-2">
+          <div className="flex h-14 shrink-0 items-center gap-2 px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 group-has-data-[collapsible=icon]/sidebar-wrapper:px-2">
             <div className="flex w-full items-center justify-between gap-2">
               <div className="flex w-full flex-row items-center justify-start">
                 <SidebarTrigger className="-ml-0.5" />
@@ -45,6 +45,8 @@ export default function OrganizationLayout({
           <Separator />
           <div className="block p-5 md:hidden">
             <Breadcrumbs />
+          </div>
+          <div className="block md:hidden">
             <Separator />
           </div>
           <Shell.Main variant="dashboard" padding="none" scale={"dashboard"}>

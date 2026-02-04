@@ -66,6 +66,12 @@ export const environmentsRouter = router({
         .select({
           id: environment.id,
           name: environment.name,
+          slug: environment.slug,
+          branch: environment.branch,
+          deployedUrl: environment.deployedUrl,
+          status: environment.status,
+          isProduction: environment.isProduction,
+          description: environment.description,
           projectId: environment.projectId,
           createdAt: environment.createdAt,
           updatedAt: environment.updatedAt,
@@ -141,10 +147,17 @@ export const environmentsRouter = router({
         .values({
           id: crypto.randomUUID(),
           name: input.name,
-          slug: input.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, ""),
+          slug:
+            input.slug ||
+            input.name
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-+|-+$/g, ""),
+          branch: input.branch || null,
+          deployedUrl: input.deployedUrl || null,
+          status: input.status,
+          isProduction: input.isProduction,
+          description: input.description || null,
           projectId: input.projectId,
         })
         .returning();
@@ -186,6 +199,15 @@ export const environmentsRouter = router({
 
       const updateData: Record<string, unknown> = {};
       if (input.name !== undefined) updateData.name = input.name;
+      if (input.slug !== undefined) updateData.slug = input.slug;
+      if (input.branch !== undefined) updateData.branch = input.branch || null;
+      if (input.deployedUrl !== undefined)
+        updateData.deployedUrl = input.deployedUrl || null;
+      if (input.status !== undefined) updateData.status = input.status;
+      if (input.isProduction !== undefined)
+        updateData.isProduction = input.isProduction;
+      if (input.description !== undefined)
+        updateData.description = input.description || null;
 
       const updatedEnvironment = await db
         .update(environment)

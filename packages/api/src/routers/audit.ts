@@ -56,8 +56,12 @@ export const auditLogsRouter = router({
           variableId: auditLog.variableId,
           action: auditLog.action,
           entityType: auditLog.entityType,
+          entitySlug: auditLog.entitySlug,
           oldValue: auditLog.oldValue,
           newValue: auditLog.newValue,
+          ipAddress: auditLog.ipAddress,
+          userAgent: auditLog.userAgent,
+          metadata: auditLog.metadata,
           createdAt: auditLog.createdAt,
         })
         .from(auditLog)
@@ -109,8 +113,12 @@ export const auditLogsRouter = router({
           variableId: auditLog.variableId,
           action: auditLog.action,
           entityType: auditLog.entityType,
+          entitySlug: auditLog.entitySlug,
           oldValue: auditLog.oldValue,
           newValue: auditLog.newValue,
+          ipAddress: auditLog.ipAddress,
+          userAgent: auditLog.userAgent,
+          metadata: auditLog.metadata,
           createdAt: auditLog.createdAt,
         })
         .from(auditLog)

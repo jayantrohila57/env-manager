@@ -79,7 +79,13 @@ export const searchVariablesInput = z.object({
 export const projectOutput = z.object({
   id: z.string(),
   name: z.string(),
+  slug: z.string(),
   description: z.string().nullable(),
+  status: z.enum(["active", "inactive", "maintenance"]),
+  isArchived: z.boolean(),
+  isPublic: z.boolean(),
+  repositoryUrl: z.string().nullable(),
+  websiteUrl: z.string().nullable(),
   userId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),

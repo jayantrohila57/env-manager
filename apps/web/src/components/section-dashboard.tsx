@@ -28,15 +28,17 @@ export default function DashboardSection({
   children,
 }: SectionProps) {
   return (
-    <Card className="relative z-10 h-full w-full gap-2 rounded-none border-none bg-transparent p-2 group-has-data-[collapsible=icon]/sidebar-wrapper:gap-0 group-has-data-[collapsible=icon]/sidebar-wrapper:p-0">
+    <Card className="relative z-10 h-full w-full gap-2 rounded-none border-none bg-transparent p-2 group-has-data-[collapsible=icon]/sidebar-wrapper:gap-2 group-has-data-[collapsible=icon]/sidebar-wrapper:px-0">
       {title && description && (
         <CardHeader className="p-0">
           <div className="flex flex-row items-center">
             <GoBackButton />
             <div className="ml-4 h-full w-full">
-              {title && <CardTitle>{slugToTitle(title)}</CardTitle>}
+              {title && (
+                <CardTitle className="text-xl">{slugToTitle(title)}</CardTitle>
+              )}
               {description && (
-                <CardDescription className="line-clamp-1">
+                <CardDescription className="line-clamp-1 text-xs">
                   {description}
                 </CardDescription>
               )}
@@ -51,8 +53,8 @@ export default function DashboardSection({
           </CardAction>
         </CardHeader>
       )}
-      <div className="h-[calc(100dvh-12rem)] overflow-auto">
-        <CardContent className="px-0 py-2">{children}</CardContent>
+      <div className="h-[calc(100dvh-10rem)] overflow-auto rounded-md border bg-background">
+        <CardContent className="p-2">{children}</CardContent>
       </div>
     </Card>
   );
