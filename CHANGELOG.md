@@ -139,18 +139,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Enhanced Project Creation Form**: Added new fields to project creation
+  - Repository URL field for linking to project source code
+  - Website URL field for project deployment links  
+  - Public/Private toggle for project visibility settings
+  - Auto-generated slugs from project names for URL-friendly identifiers
+
 ### Changed
 
-- Refined UI spacing and padding across card components for better visual consistency
-- Removed unused @base-ui/react dependency
-- Updated avatar and sidebar component styling
-- Improved layout component spacing and alignment
+- **API Schema Updates**: Extended project and environment schemas with new fields
+- **Database Integration**: Updated create mutations to handle new project fields
+- **Code Cleanup**: Removed deprecated templates domain and components
+- **Build Fixes**: Resolved TypeScript compilation errors and lint issues
 
 ### Fixed
 
 - Database schema regeneration after dropping all tables
 - Generated new migration (0002_neat_ender_wiggin.sql) with updated schema
 - Applied database migrations successfully with proper indexes and constraints
+- Fixed environment creation missing required slug field
+- Removed broken template references and components
 
 ## [1.2.0] - 2026-01-19
 

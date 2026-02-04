@@ -141,6 +141,10 @@ export const environmentsRouter = router({
         .values({
           id: crypto.randomUUID(),
           name: input.name,
+          slug: input.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, ""),
           projectId: input.projectId,
         })
         .returning();

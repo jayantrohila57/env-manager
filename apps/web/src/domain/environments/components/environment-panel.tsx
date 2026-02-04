@@ -1,6 +1,5 @@
 "use client";
 
-import { ApplyTemplateDialog } from "@/domain/templates/components/apply-template-dialog";
 import { useVariables } from "../hooks/use-variables";
 import { AddVariableDialog } from "./add-variable-dialog";
 import { VariablesSkeleton } from "./skeletons";
@@ -48,7 +47,6 @@ export function EnvironmentPanel({ environmentId }: { environmentId: string }) {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-lg">Variables</h3>
         <div className="flex items-center gap-2">
-          <ApplyTemplateDialog environmentId={environmentId} />
           <AddVariableDialog onConfirm={handleCreate} isPending={isCreating} />
         </div>
       </div>

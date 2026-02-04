@@ -51,7 +51,13 @@ export const projectsRouter = router({
         .select({
           id: project.id,
           name: project.name,
+          slug: project.slug,
           description: project.description,
+          isArchived: project.isArchived,
+          isPublic: project.isPublic,
+          repositoryUrl: project.repositoryUrl,
+          websiteUrl: project.websiteUrl,
+          status: project.status,
           userId: project.userId,
           createdAt: project.createdAt,
           updatedAt: project.updatedAt,
@@ -99,6 +105,13 @@ export const projectsRouter = router({
           id: crypto.randomUUID(),
           name: input.name,
           description: input.description,
+          repositoryUrl: input.repositoryUrl || null,
+          websiteUrl: input.websiteUrl || null,
+          isPublic: input.isPublic,
+          slug: input.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, ""),
           userId: ctx.session.user.id,
         })
         .returning();
@@ -137,6 +150,11 @@ export const projectsRouter = router({
       if (input.name !== undefined) updateData.name = input.name;
       if (input.description !== undefined)
         updateData.description = input.description;
+      if (input.repositoryUrl !== undefined)
+        updateData.repositoryUrl = input.repositoryUrl || null;
+      if (input.websiteUrl !== undefined)
+        updateData.websiteUrl = input.websiteUrl || null;
+      if (input.isPublic !== undefined) updateData.isPublic = input.isPublic;
 
       const updatedProject = await db
         .update(project)

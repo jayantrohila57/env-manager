@@ -26,12 +26,18 @@ export const respond = <T>({
 export const createProjectInput = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
+  repositoryUrl: z.string().url().optional().or(z.literal("")),
+  websiteUrl: z.string().url().optional().or(z.literal("")),
+  isPublic: z.boolean().default(false),
 });
 
 export const updateProjectInput = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(100).optional(),
   description: z.string().optional(),
+  repositoryUrl: z.string().url().optional().or(z.literal("")),
+  websiteUrl: z.string().url().optional().or(z.literal("")),
+  isPublic: z.boolean().optional(),
 });
 
 export const getProjectInput = z.object({
@@ -41,7 +47,13 @@ export const getProjectInput = z.object({
 export const projectOutput = z.object({
   id: z.string(),
   name: z.string(),
+  slug: z.string(),
   description: z.string().nullable(),
+  isArchived: z.boolean(),
+  isPublic: z.boolean(),
+  repositoryUrl: z.string().nullable(),
+  websiteUrl: z.string().nullable(),
+  status: z.string(),
   userId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
