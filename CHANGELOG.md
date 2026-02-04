@@ -141,6 +141,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Refined UI spacing and padding across card components for better visual consistency
+- Removed unused @base-ui/react dependency
+- Updated avatar and sidebar component styling
+- Improved layout component spacing and alignment
+
 ### Fixed
 
 ## [1.2.0] - 2026-01-19

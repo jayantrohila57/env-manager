@@ -30,7 +30,7 @@ export default function OrganizationLayout({
                 <SidebarTrigger className="-ml-0.5" />
                 <Separator
                   orientation="vertical"
-                  className="mr-2 data-[orientation=vertical]:h-4"
+                  className="my-auto mr-2 ml-1 data-[orientation=vertical]:h-6"
                 />
                 <div className="hidden md:block">
                   <Breadcrumbs />
@@ -45,8 +45,8 @@ export default function OrganizationLayout({
           <Separator />
           <div className="block p-5 md:hidden">
             <Breadcrumbs />
+            <Separator />
           </div>
-          <Separator />
           <Shell.Main variant="dashboard" padding="none" scale={"dashboard"}>
             {children}
           </Shell.Main>

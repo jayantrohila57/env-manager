@@ -27,7 +27,7 @@ export function ProjectCardView({ project }: ProjectCardViewProps) {
       href={`/dashboard/projects/${project.id}` as Route}
       className="flex-1"
     >
-      <Card className="group relative aspect-video gap-0 transition-shadow hover:bg-accent">
+      <Card className="group relative aspect-square gap-1 border bg-input/30">
         <CardHeader>
           <Folder />
         </CardHeader>

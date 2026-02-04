@@ -2,7 +2,7 @@
 
 import type { User } from "better-auth";
 import { LogOut } from "lucide-react";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -19,6 +19,12 @@ export function UserMenu() {
   const [isLoading, startTransition] = useTransition();
   const { data: session } = useSession();
   const user = session?.user as User;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleSignOut = () => {
     startTransition(async () => {
       const toastId = toast.loading("Signing out...");
@@ -36,6 +42,16 @@ export function UserMenu() {
       }
     });
   };
+
+  if (!mounted) {
+    return (
+      <Avatar className="border bg-background shadow-xs">
+        <AvatarFallback>
+          {user?.name?.charAt(0) || user?.email?.charAt(0) || "U"}
+        </AvatarFallback>
+      </Avatar>
+    );
+  }
 
   return (
     <DropdownMenu>
