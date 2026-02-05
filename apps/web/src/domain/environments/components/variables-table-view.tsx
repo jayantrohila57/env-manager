@@ -9,6 +9,16 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -34,6 +44,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AddVariableDialog } from "./add-variable-dialog";
+import { EditVariableDialog } from "./edit-variable-dialog";
 
 interface Variable {
   id: string;
@@ -61,6 +72,33 @@ export function VariablesTableView({
   onAddVariable,
   isAddingVariable,
 }: VariablesTableViewProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState<Variable | null>(null);
+
+  const handleCopy = async (id: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      onCopy(id);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  const handleDelete = (variable: Variable) => {
+    setDeleteDialogOpen(variable.id);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteDialogOpen) {
+      onDelete(deleteDialogOpen);
+      setDeleteDialogOpen(null);
+    }
+  };
+
+  const handleEdit = (variable: Variable) => {
+    setEditDialogOpen(variable);
+  };
+
   if (variables.length === 0) {
     return (
       <Empty className="h-full w-full border-2 border-muted-foreground/20 border-dashed bg-muted/30">
@@ -84,8 +122,8 @@ export function VariablesTableView({
   }
 
   return (
-    <div className="rounded-lg border">
-      <Table>
+    <>
+      <Table className="rounded-lg border">
         <TableHeader>
           <TableRow>
             <TableHead className="w-1/3">Key</TableHead>
@@ -101,9 +139,9 @@ export function VariablesTableView({
               </TableCell>
               <TableCell className="font-mono text-muted-foreground">
                 {revealedIds.has(variable.id) ? (
-                  <span className="break-all">••••••••</span> // Mocking value reveal logic
+                  <span className="break-all">{variable.value}</span>
                 ) : (
-                  "••••••••"
+                  <span className="break-all">••••••</span>
                 )}
               </TableCell>
               <TableCell className="text-right">
@@ -124,7 +162,7 @@ export function VariablesTableView({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => onCopy(variable.id)}
+                    onClick={() => handleCopy(variable.id, variable.value)}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -135,13 +173,13 @@ export function VariablesTableView({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onEdit(variable)}>
+                      <DropdownMenuItem onClick={() => handleEdit(variable)}>
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        onClick={() => onDelete(variable.id)}
+                        onClick={() => handleDelete(variable)}
                         className="text-destructive focus:text-destructive"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -155,6 +193,47 @@ export function VariablesTableView({
           ))}
         </TableBody>
       </Table>
-    </div>
+
+      {/* Edit Dialog */}
+      {editDialogOpen && (
+        <EditVariableDialog
+          variable={editDialogOpen}
+          onConfirm={async (data) => {
+            onEdit(data);
+            setEditDialogOpen(null);
+          }}
+          isPending={false}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialogOpen && (
+        <AlertDialog
+          open={!!deleteDialogOpen}
+          onOpenChange={() => setDeleteDialogOpen(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Variable</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete the variable "
+                {variables.find((v) => v.id === deleteDialogOpen)?.key}"? This
+                action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel asChild>
+                <Button variant="outline">Cancel</Button>
+              </AlertDialogCancel>
+              <AlertDialogAction asChild>
+                <Button variant="destructive" onClick={confirmDelete}>
+                  Delete
+                </Button>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </>
   );
 }
