@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Project Management**: Complete project editing functionality
+  - Added project edit dialog with form validation
+  - Implemented project edit page with client-side state management
+  - Added project actions component for edit/delete operations
+- **Environment Management**: Enhanced environment editing capabilities
+  - Added edit environment dialog with real-time validation
+  - Improved environment panel UI with better layout
+  - Enhanced environments tabs view with improved navigation
+- **Variable Management**: Full CRUD operations for environment variables
+  - Added edit variable dialog with encryption support
+  - Enhanced variables table view with sorting and filtering
+  - Improved variable hooks with better error handling
+- **Dashboard**: Updated dashboard stats component with improved metrics
+
+### Changed
+
+- Refactored project components to use consistent UI patterns
+- Improved error handling across all environment and variable components
+- Updated API router for variables with better security and validation
+- Enhanced TypeScript types for better type safety
+
+### Fixed
+
+- Resolved variable table CRUD functionality issues
+- Fixed TypeScript build errors in environment hooks
+- Improved form validation in edit dialogs
+
 ## [1.1.0] - 2025-01-19
 
 ### Added
