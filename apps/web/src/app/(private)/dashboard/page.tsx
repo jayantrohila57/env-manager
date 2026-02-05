@@ -1,9 +1,10 @@
+import DashboardStats from "@/components/dashboard-stats";
 import DashboardSection from "@/components/section-dashboard";
 import Shell from "@/components/shell";
 
 const header = {
   title: "Dashboard",
-  description: "Manage your dashboard",
+  description: "Overview of your environment manager statistics",
 };
 
 export default function DashboardPage() {
@@ -11,7 +12,7 @@ export default function DashboardPage() {
     <Shell>
       <Shell.Section variant="dashboard" padding="dashboard" scale="full">
         <DashboardSection {...header}>
-          <div>Dashboard</div>
+          <DashboardStats />
         </DashboardSection>
       </Shell.Section>
     </Shell>

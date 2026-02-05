@@ -1,5 +1,6 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
 import { auditLogsRouter } from "./audit";
+import { dashboardRouter } from "./dashboard";
 import { environmentsRouter } from "./environments";
 import { projectsRouter } from "./projects";
 import { environmentVariablesRouter } from "./variables";
@@ -14,6 +15,7 @@ export const appRouter = router({
       user: ctx.session.user,
     };
   }),
+  dashboard: dashboardRouter,
   projects: projectsRouter,
   environments: environmentsRouter,
   environmentVariables: environmentVariablesRouter,

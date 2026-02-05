@@ -24,6 +24,7 @@ import {
 import { useProjects } from "@/domain/projects/hooks/use-projects";
 import { siteConfig } from "@/lib/siteConfig";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Separator } from "./ui/separator";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -79,6 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <Separator className="my-2" />
           <SidebarGroupContent>
             <SidebarMenu className="flex flex-col gap-1">
               {menuItems.map((item) => {
@@ -101,8 +103,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
         <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
+          <Separator className="my-2" />
           <SidebarGroupContent>
             <SidebarMenu className="flex flex-col gap-1">
               {status === "loading" && (
