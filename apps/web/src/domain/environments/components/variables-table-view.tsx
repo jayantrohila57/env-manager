@@ -10,6 +10,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -45,14 +46,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAppNavigation } from "@/utils/navigation";
 import { AddVariableDialog } from "./add-variable-dialog";
 import { EditVariableDialog } from "./edit-variable-dialog";
 
 interface Variable {
   id: string;
   key: string;
-  value: string;
+  value?: string;
   environmentId: string;
   createdAt: string;
   updatedAt: string;
@@ -81,7 +81,6 @@ export function VariablesTableView({
 }: VariablesTableViewProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState<Variable | null>(null);
-  const navigation = useAppNavigation();
 
   const handleCopy = async (id: string) => {
     try {
@@ -135,15 +134,13 @@ export function VariablesTableView({
   return (
     <>
       <div className="mb-4 flex justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigation.redirectToDashboard()}
-          className="flex items-center gap-2"
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 rounded-md border bg-background px-3 py-2 font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <BarChart3 className="h-4 w-4" />
           Dashboard Stats
-        </Button>
+        </Link>
       </div>
       <Table className="rounded-lg border">
         <TableHeader>
@@ -163,7 +160,7 @@ export function VariablesTableView({
                 {revealedIds.has(variable.id) ? (
                   <span className="break-all">{variable.value}</span>
                 ) : (
-                  <span className="break-all">••••••</span>
+                  <span className="break-all">•••••</span>
                 )}
               </TableCell>
               <TableCell className="text-right">
@@ -184,7 +181,7 @@ export function VariablesTableView({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => handleCopy(variable.id, variable.value)}
+                    onClick={() => handleCopy(variable.id)}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -219,9 +216,18 @@ export function VariablesTableView({
       {/* Edit Dialog */}
       {editDialogOpen && (
         <EditVariableDialog
-          variable={editDialogOpen}
+          variable={{
+            id: editDialogOpen.id,
+            key: editDialogOpen.key,
+            value: editDialogOpen.value || "",
+          }}
           onConfirm={async (data) => {
-            onEdit(data);
+            const updatedVariable: Variable = {
+              ...editDialogOpen,
+              key: data.key,
+              value: data.value,
+            };
+            onEdit(updatedVariable);
             setEditDialogOpen(null);
           }}
           isPending={false}
@@ -238,7 +244,7 @@ export function VariablesTableView({
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Variable</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete the variable "
+                Are you sure you want to delete variable "
                 {variables.find((v) => v.id === deleteDialogOpen)?.key}"? This
                 action cannot be undone.
               </AlertDialogDescription>

@@ -97,6 +97,67 @@ export function useEnvironments(projectSlug: string) {
     }),
   );
 
+  const updateEnvMutation = useMutation(
+    trpc.environments.update.mutationOptions({
+      onMutate: async (variables) => {
+        await queryClient.cancelQueries({
+          queryKey: trpc.projects.getBySlug.queryKey({ slug: projectSlug }),
+        });
+
+        const previousProjectData = queryClient.getQueryData(
+          trpc.projects.getBySlug.queryKey({ slug: projectSlug }),
+        ) as ProjectQueryResponse | undefined;
+
+        if (previousProjectData?.data) {
+          queryClient.setQueryData(
+            trpc.projects.getBySlug.queryKey({ slug: projectSlug }),
+            {
+              ...previousProjectData,
+              data: {
+                ...previousProjectData.data,
+                environments: previousProjectData.data.environments.map(
+                  (env) =>
+                    env.id === variables.id
+                      ? {
+                          ...env,
+                          ...(variables.name && { name: variables.name }),
+                          updatedAt: new Date().toISOString(),
+                        }
+                      : env,
+                ),
+              },
+            },
+          );
+        }
+
+        return { previousProjectData };
+      },
+      onError: (error) => {
+        toast.error(error.message);
+        // Rollback to previous value
+        if (updateEnvMutation.context?.previousProjectData) {
+          queryClient.setQueryData(
+            trpc.projects.getBySlug.queryKey({ slug: projectSlug }),
+            updateEnvMutation.context.previousProjectData,
+          );
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success to ensure consistency
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.getBySlug.queryKey({ slug: projectSlug }),
+        });
+        // Also invalidate projects list to reflect any changes
+        queryClient.invalidateQueries({
+          queryKey: trpc.projects.list.queryKey(),
+        });
+      },
+      onSuccess: () => {
+        toast.success("Environment updated successfully");
+      },
+    }),
+  );
+
   const status: "loading" | "error" | "success" = projectQuery.isLoading
     ? "loading"
     : projectQuery.isError
@@ -117,6 +178,8 @@ export function useEnvironments(projectSlug: string) {
     setActiveTab,
     createEnvironment: createEnvMutation.mutateAsync,
     isCreating: createEnvMutation.isPending,
+    updateEnvironment: updateEnvMutation.mutateAsync,
+    isUpdating: updateEnvMutation.isPending,
     projectId: projectData.project?.id,
   };
 }

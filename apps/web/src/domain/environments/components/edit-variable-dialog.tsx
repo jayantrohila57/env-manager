@@ -20,7 +20,7 @@ interface EditVariableDialogProps {
   variable: {
     id: string;
     key: string;
-    value: string;
+    value?: string;
   };
   onConfirm: (data: {
     id: string;
@@ -37,7 +37,7 @@ export function EditVariableDialog({
 }: EditVariableDialogProps) {
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState(variable.key);
-  const [value, setValue] = useState(variable.value);
+  const [value, setValue] = useState(variable.value || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -8,6 +8,10 @@ import { VariablesTableView } from "./variables-table-view";
 interface Variable {
   id: string;
   key: string;
+  environmentId: string;
+  createdAt: string;
+  updatedAt: string;
+  value?: string;
 }
 
 export function EnvironmentPanel({ environmentId }: { environmentId: string }) {

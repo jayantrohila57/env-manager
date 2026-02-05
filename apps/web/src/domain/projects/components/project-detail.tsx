@@ -19,6 +19,7 @@ import { EnvironmentPanel } from "../../environments/components/environment-pane
 import { EnvironmentsTabsView } from "../../environments/components/environments-tabs-view";
 import { ProjectDetailSkeleton } from "../../environments/components/skeletons";
 import { useEnvironments } from "../../environments/hooks/use-environments";
+import { EditProjectDialog } from "../components/project-edit-dialog";
 import { ProjectActions } from "./project-actions";
 
 export default function ProjectDetail({
@@ -35,7 +36,9 @@ export default function ProjectDetail({
     activeTab,
     setActiveTab,
     createEnvironment,
+    updateEnvironment,
     isCreating,
+    isUpdating,
     projectId,
   } = useEnvironments(projectSlug);
 
@@ -66,6 +69,10 @@ export default function ProjectDetail({
           </CardTitle>
           <CardAction>
             <div className="flex items-center gap-3">
+              <EditProjectDialog
+                project={project}
+                onUpdate={handleProjectUpdate}
+              />
               <ProjectActions
                 project={project}
                 onUpdate={handleProjectUpdate}
@@ -137,7 +144,11 @@ export default function ProjectDetail({
           if (!projectId) return;
           await createEnvironment({ projectId, name });
         }}
+        onUpdate={async (id, name) => {
+          await updateEnvironment({ id, name });
+        }}
         isCreating={isCreating}
+        isUpdating={isUpdating}
       >
         {(env) => <EnvironmentPanel environmentId={env.id} />}
       </EnvironmentsTabsView>

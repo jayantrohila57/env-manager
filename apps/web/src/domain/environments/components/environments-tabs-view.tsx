@@ -1,6 +1,7 @@
 "use client";
 
-import { FileKey, Plus } from "lucide-react";
+import { Edit, FileKey, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/empty";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateEnvironmentDialog } from "./create-environment-dialog";
+import { EditEnvironmentDialog } from "./edit-environment-dialog";
 
 interface Environment {
   id: string;
@@ -29,7 +31,9 @@ interface EnvironmentsTabsViewProps {
   activeTab?: string;
   onTabChange: (id: string) => void;
   onCreate: (name: string) => Promise<void>;
+  onUpdate: (id: string, name: string) => Promise<void>;
   isCreating: boolean;
+  isUpdating: boolean;
   children: (env: Environment) => React.ReactNode;
 }
 
@@ -38,7 +42,9 @@ export function EnvironmentsTabsView({
   activeTab,
   onTabChange,
   onCreate,
+  onUpdate,
   isCreating,
+  isUpdating,
   children,
 }: EnvironmentsTabsViewProps) {
   if (environments.length === 0) {
@@ -86,13 +92,30 @@ export function EnvironmentsTabsView({
                 <TabsTrigger
                   className={
                     activeTab === env.id
-                      ? "rounded-none border-b-2 border-b-primary text-lg text-primary"
-                      : "rounded-none border-b-2 border-b-border text-lg"
+                      ? "group relative rounded-none border-b-2 border-b-primary text-lg text-primary"
+                      : "group relative rounded-none border-b-2 border-b-border text-lg"
                   }
                   key={env.id}
                   value={env.id}
                 >
-                  {env.name}
+                  <span className="pr-6">{env.name}</span>
+                  <EditEnvironmentDialog
+                    environment={env}
+                    onConfirm={onUpdate}
+                    isPending={isUpdating}
+                    trigger={
+                      <div className="absolute top-1/2 right-1 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-4 w-4"
+                          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    }
+                  />
                 </TabsTrigger>
               ))}
             </TabsList>

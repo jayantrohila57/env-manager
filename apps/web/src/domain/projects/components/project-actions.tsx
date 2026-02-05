@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useProjectActions } from "../hooks/use-project-actions";
 import { ProjectActionDialog } from "./project-action-dialog";
+import { EditProjectDialog } from "./project-edit-dialog";
 
 interface ProjectActionsProps {
   project: ProjectOutput;
@@ -58,6 +59,11 @@ export function ProjectActions({ project, onUpdate }: ProjectActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-80">
           <DropdownMenuLabel>Project Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+
+          {/* Edit Action */}
+          <EditProjectDialog project={project} onUpdate={onUpdate} />
+
           <DropdownMenuSeparator />
 
           {/* Status Actions */}

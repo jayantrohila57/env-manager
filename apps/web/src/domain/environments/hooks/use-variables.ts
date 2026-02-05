@@ -11,6 +11,7 @@ type VariableOutput = {
   environmentId: string;
   createdAt: string;
   updatedAt: string;
+  value?: string;
 };
 
 interface VariablesQueryResponse {
@@ -46,6 +47,7 @@ export function useVariables(environmentId: string) {
           const newVariable: VariableOutput = {
             id: `temp-${Date.now()}`,
             key: variables.key,
+            value: variables.value,
             environmentId,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -199,6 +201,7 @@ export function useVariables(environmentId: string) {
             (variable, index) => ({
               id: `temp-bulk-${Date.now()}-${index}`,
               key: variable.key,
+              value: variable.value,
               environmentId,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),

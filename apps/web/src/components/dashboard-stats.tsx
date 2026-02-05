@@ -9,6 +9,8 @@ import {
   Sparkles,
   TrendingUp,
 } from "lucide-react";
+import type { Route } from "next";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -66,11 +68,12 @@ interface StatCardProps {
   icon: React.ReactNode;
   description?: string;
   variant?: "default" | "secondary";
+  href?: string;
 }
 
-function StatCard({ title, value, icon, description }: StatCardProps) {
-  return (
-    <Card className="border bg-input/30">
+function StatCard({ title, value, icon, description, href }: StatCardProps) {
+  const cardContent = (
+    <Card className="cursor-pointer border bg-input/30 transition-colors hover:bg-accent/50">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="font-medium text-sm">{title}</CardTitle>
         <CardAction>{icon}</CardAction>
@@ -83,6 +86,12 @@ function StatCard({ title, value, icon, description }: StatCardProps) {
       </CardContent>
     </Card>
   );
+
+  if (href) {
+    return <Link href={href as Route}>{cardContent}</Link>;
+  }
+
+  return cardContent;
 }
 
 function ChartSkeleton() {
@@ -170,7 +179,7 @@ export default function DashboardStats() {
     <div className="space-y-2">
       {/* Welcome Section */}
       <div className="rounded-lg border bg-card p-4">
-        <div className="flex flex-col items-start items-center justify-between gap-4">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex items-center justify-start space-x-4">
             <Avatar className="h-24 w-24 border-2">
               <AvatarImage
@@ -205,13 +214,14 @@ export default function DashboardStats() {
 
       <Separator />
 
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Projects"
           value={stats.totalProjects}
           icon={<FolderOpen className="h-6 w-6 text-muted-foreground" />}
           description={`${stats.activeProjects} active`}
           variant="secondary"
+          href="/dashboard/projects"
         />
         <StatCard
           title="Total Environments"
@@ -219,6 +229,7 @@ export default function DashboardStats() {
           icon={<Server className="h-6 w-6 text-muted-foreground" />}
           description={`${stats.activeEnvironments} active`}
           variant="secondary"
+          href="/dashboard/projects"
         />
         <StatCard
           title="Environment Variables"
@@ -226,6 +237,7 @@ export default function DashboardStats() {
           icon={<Key className="h-6 w-6 text-muted-foreground" />}
           description="Across all environments"
           variant="secondary"
+          href="/dashboard/projects"
         />
         <StatCard
           title="Production Environments"
@@ -233,6 +245,7 @@ export default function DashboardStats() {
           icon={<Factory className="h-6 w-6 text-muted-foreground" />}
           description="Live environments"
           variant="secondary"
+          href="/dashboard/projects"
         />
         <StatCard
           title="Recent Activity"

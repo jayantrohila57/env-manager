@@ -130,6 +130,7 @@ export const environmentVariablesRouter = router({
         .values({
           id: crypto.randomUUID(),
           key: input.key,
+          value: input.value,
           encryptedValue: encrypt(input.value),
           environmentId: input.environmentId,
         })
@@ -356,6 +357,7 @@ export const environmentVariablesRouter = router({
           await db.insert(environmentVariable).values({
             id: crypto.randomUUID(),
             key: variable.key,
+            value: variable.value,
             encryptedValue: encrypt(variable.value),
             environmentId: input.environmentId,
           });
