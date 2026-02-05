@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BarChart3,
   Copy,
   Eye,
   EyeOff,
@@ -9,6 +10,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,12 +45,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAppNavigation } from "@/utils/navigation";
 import { AddVariableDialog } from "./add-variable-dialog";
 import { EditVariableDialog } from "./edit-variable-dialog";
 
 interface Variable {
   id: string;
   key: string;
+  value: string;
+  environmentId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface VariablesTableViewProps {
@@ -74,11 +81,15 @@ export function VariablesTableView({
 }: VariablesTableViewProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState<Variable | null>(null);
+  const navigation = useAppNavigation();
 
-  const handleCopy = async (id: string, value: string) => {
+  const handleCopy = async (id: string) => {
     try {
-      await navigator.clipboard.writeText(value);
-      onCopy(id);
+      const variable = variables.find((v) => v.id === id);
+      if (variable?.value) {
+        await navigator.clipboard.writeText(variable.value);
+        onCopy(id);
+      }
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -123,6 +134,17 @@ export function VariablesTableView({
 
   return (
     <>
+      <div className="mb-4 flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigation.redirectToDashboard()}
+          className="flex items-center gap-2"
+        >
+          <BarChart3 className="h-4 w-4" />
+          Dashboard Stats
+        </Button>
+      </div>
       <Table className="rounded-lg border">
         <TableHeader>
           <TableRow>

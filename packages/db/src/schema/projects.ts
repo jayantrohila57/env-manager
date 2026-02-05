@@ -82,6 +82,7 @@ export const environmentVariable = pgTable(
     id: text("id").primaryKey(),
     key: text("key").notNull(),
     encryptedValue: text("encrypted_value").notNull(),
+    value: text("value").notNull(),
     environmentId: text("environment_id")
       .notNull()
       .references(() => environment.id, { onDelete: "cascade" }),
